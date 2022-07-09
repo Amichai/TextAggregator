@@ -1,27 +1,9 @@
 <template>
   <PageNavbar />
   <div class="root">
-    <div class="project-name">
-      <h2
-        v-if="!isEditingTitle"
-        class="project-name-header"
-        @click="isEditingTitle = true"
-      >
-        {{ projectName }}
-      </h2>
-      <div class="edit-title-wrapper" v-if="isEditingTitle">
-        <input
-          class="edit-title-input form-control"
-          type="text"
-          v-model="projectName"
-          placeholder="Title"
-          @blur="setIsEditingTitle(false)"
-          @keyup.enter="setIsEditingTitle(false)"
-          v-focus
-        />
-      </div>
-    </div>
-
+    <EditableTitle
+      v-model="projectName"
+    />
     <NewSnippetButton
       :clickEvent="() => router.push(`/${projectId}/NewSnippet`)"
     />
@@ -61,12 +43,14 @@ import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRoute, useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
 import NewSnippetButton from './NewSnippetButton.vue';
+import EditableTitle from './EditableTitle.vue';
 
 export default defineComponent({
   components: {
     VueTagsInput,
     PageNavbar,
     NewSnippetButton,
+    EditableTitle,
   },
   props: {
     projectId: {
@@ -87,18 +71,10 @@ export default defineComponent({
     const tags = ref([]);
 
     const projectName = ref('Project Name');
-    const isEditingTitle = ref(!projectName.value);
 
     const query = { ...route.query };
 
     const path = window.location.pathname;
-
-    const setIsEditingTitle = (isEditing) => {
-      if (!isEditing && !projectName.value) {
-        return;
-      }
-      isEditingTitle.value = isEditing;
-    };
 
     query.tags
       ?.split(',')
@@ -148,8 +124,6 @@ export default defineComponent({
       tagClicked,
 
       router,
-      isEditingTitle,
-      setIsEditingTitle,
 
       projectName,
     };
@@ -180,29 +154,5 @@ export default defineComponent({
 
 .root {
   padding: 0 18% 0 18%;
-}
-
-.project-name {
-  display: flex;
-  height: 3em;
-}
-
-.project-name-header {
-  padding: 0.5px 0.2em 0.5px 0.2em;
-}
-
-.project-name-header:hover {
-  border-style: solid;
-  border-width: 0.5px;
-  /* padding: 0 0.2em 0 0.2em; */
-}
-
-.edit-title-wrapper {
-  display: flex;
-  width: 100%;
-}
-
-.edit-title-input {
-  margin: 3px;
 }
 </style>
