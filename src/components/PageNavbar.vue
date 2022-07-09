@@ -4,7 +4,7 @@
       <div
         class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
       >
-        <a class="navbar-brand" href="/Projects">
+        <a class="navbar-brand" href="/">
           <img src="../assets/logo.png" width="40" />
         </a>
         <a
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   setup() {

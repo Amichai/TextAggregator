@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   components: {},
@@ -21,19 +21,19 @@ export default defineComponent({
   setup(props, { emit }) {
     const projectList = [
       {
-        name: "project 1",
+        name: 'project 1',
         id: 123,
       },
       {
-        name: "project 2",
+        name: 'project 2',
         id: 124,
       },
       {
-        name: "project 3",
+        name: 'project 3',
         id: 125,
       },
       {
-        name: "project 4",
+        name: 'project 4',
         id: 126,
       },
     ];

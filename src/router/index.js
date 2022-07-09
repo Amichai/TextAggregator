@@ -1,17 +1,24 @@
-import { createRouter, createWebHistory } from "vue-router";
-import ProjectBoard from "./../components/ProjectBoard.vue";
-import ProjectsList from "./../components/ProjectsList.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+import ProjectBoard from '../components/ProjectBoard.vue';
+import ProjectsList from '../components/ProjectsList.vue';
+import NewSnippet from '../components/NewSnippet.vue';
 
 const routes = [
   {
-    path: "/project/:projectId",
-    name: "Project",
+    path: '/project/:projectId',
+    name: 'Project',
     component: ProjectBoard,
     props: true,
   },
   {
-    path: "/projects",
-    name: "Projects",
+    path: '/:projectId/NewSnippet',
+    name: 'New Snippet',
+    component: NewSnippet,
+    props: true,
+  },
+  {
+    path: '/',
+    name: 'Home',
     component: ProjectsList,
     props: true,
   },
