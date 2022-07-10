@@ -1,8 +1,8 @@
 <template>
-  <div class="project-name">
+  <div class="notebook-name">
     <h2
       v-if="!isEditingTitle"
-      class="project-name-header"
+      class="notebook-name-header"
       @click="isEditingTitle = true"
     >
       {{ modelValueModified }}
@@ -63,16 +63,16 @@ export default defineComponent({
 </script>
 
 <style>
-.project-name {
+.notebook-name {
   display: flex;
   height: 3em;
 }
 
-.project-name-header {
+.notebook-name-header {
   padding: 0.5px 0.2em 0.5px 0.2em;
 }
 
-.project-name-header:hover {
+.notebook-name-header:hover {
   border-style: solid;
   border-width: 0.5px;
 }

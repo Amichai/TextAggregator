@@ -8,7 +8,7 @@
           <img src="../assets/logo.png" width="40" />
         </a>
         <a
-          href="/Projects"
+          href="/Notebooks"
           class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"
         >
           <svg

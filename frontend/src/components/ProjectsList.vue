@@ -1,8 +1,8 @@
 <template>
-  <div class="project-list">
-    <div v-for="project in projectList" :key="project.id" class="project">
-      <a :href="`/project/${project.id}`">
-        {{ project.name }}
+  <div class="notebook-list">
+    <div v-for="notebook in notebookList" :key="notebook.id" class="notebook">
+      <a :href="`/notebook/${notebook.id}`">
+        {{ notebook.name }}
       </a>
     </div>
   </div>
@@ -19,40 +19,41 @@ export default defineComponent({
   emits: [],
 
   setup(props, { emit }) {
-    const projectList = [
+    // query the database for a list of notebooks, ids and names - visiblity
+    const notebookList = [
       {
-        name: 'project 6',
+        name: 'Notebook 6',
         id: 123,
       },
       {
-        name: 'project 2',
+        name: 'Notebook 2',
         id: 124,
       },
       {
-        name: 'project 3',
+        name: 'Notebook 3',
         id: 125,
       },
       {
-        name: 'project 4',
-        id: 126,
+        name: 'Notebook 4',
+        id: 128,
       },
     ];
 
     return {
-      projectList,
+      notebookList,
     };
   },
 });
 </script>
 
 <style scoped>
-.project {
+.notebook {
   margin: 1em;
   padding: 1.5em;
   background-color: lightgray;
 }
 
-.project-list {
+.notebook-list {
   display: flex;
 }
 </style>

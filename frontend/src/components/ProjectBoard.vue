@@ -2,12 +2,12 @@
   <PageNavbar />
   <div class="root">
     <EditableTitle
-      v-model="projectName"
+      v-model="notebookName"
     />
     <NewSnippetButton
-      :clickEvent="() => router.push(`/${projectId}/NewSnippet`)"
+      :clickEvent="() => router.push(`/${notebookId}/NewSnippet`)"
     />
-    <div class="feed-filters">
+    <div class="snippet-filters">
       <VueTagsInput
         class="vue-tags-input"
         placeholder="Tag filters"
@@ -17,13 +17,18 @@
       />
     </div>
 
-    <ul id="feed-list"></ul>
-    <div v-if="notesFiltered.length === 0 && notes.length > 0">
+    <ul id="snippet-list">
+      <li v-for="snippet in snippetsFiltered" :key="snippet.userId-snippetId" class="snippet-item">
+        <SnippetItem />
+      </li>
+
+    </ul>
+    <div v-if="snippetsFiltered.length === 0 && snippets.length > 0">
       <br />
       <br />
       <i>No results match selected tag filters</i>
     </div>
-    <div v-if="notes.length === 0">
+    <div v-if="snippets.length === 0">
       <br />
       <br />
       <i>No Snippets to show</i>
@@ -34,7 +39,7 @@
 <script>
 // This view is similar to keep
 // A rich editor at the top to create a note
-// a list of notes + tags
+// a list of snippets + tags
 // search, tag filtering
 // collaborators
 // When clicked, display the content in a scrollable modal?
@@ -44,6 +49,7 @@ import { useRoute, useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
 import NewSnippetButton from './NewSnippetButton.vue';
 import EditableTitle from './EditableTitle.vue';
+import SnippetItem from './SnippetItem.vue';
 
 export default defineComponent({
   components: {
@@ -51,26 +57,36 @@ export default defineComponent({
     PageNavbar,
     NewSnippetButton,
     EditableTitle,
+    SnippetItem,
   },
   props: {
-    projectId: {
+    notebookId: {
       type: String,
       default: '',
     },
   },
 
   setup(props) {
-    console.log(`Project id: ${props.projectId}`);
+    console.log(`notebook id4: ${props.notebookId}`);
+    const snippets = ref([]);
+
+    // fetch(`https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${props.notebookId}`)
+    //   .then((response) => response.json())
+    //   .then((asJson) => {
+    //     console.log(asJson);
+    //     snippets.value = asJson.Items;
+    //     console.log("GG")
+    //   });
+
+    // Query the notebook by id to get the notebok name and the list of snippets and users
 
     const route = useRoute();
     const router = useRouter();
 
-    const notes = ref([]);
-
     const tag = ref('');
     const tags = ref([]);
 
-    const projectName = ref('Project Name');
+    const notebookName = ref('Notebook Name');
 
     const query = { ...route.query };
 
@@ -78,24 +94,20 @@ export default defineComponent({
 
     query.tags
       ?.split(',')
-      .forEach((tagText) =>
-        tags.value.push({ text: tagText, tiClasses: ['ti-valid'] })
-      );
-    const notesFiltered = ref(notes.value);
+      .forEach((tagText) => tags.value.push({ text: tagText, tiClasses: ['ti-valid'] }));
+    const snippetsFiltered = ref(snippets.value);
 
     const filterItems = () => {
       if (tags.value.length === 0) {
-        notesFiltered.value = notes;
+        snippetsFiltered.value = snippets;
         router.push({ path, query: {} });
         return;
       }
 
       const filterTags = tags.value.map((tag) => tag.text);
-      notesFiltered.value = notes.value.filter((item) =>
-        item.tags
-          .map((tag) => tag.text)
-          .some((tagText) => filterTags.includes(tagText))
-      );
+      snippetsFiltered.value = snippets.value.filter((item) => item.tags
+        .map((tag) => tag.text)
+        .some((tagText) => filterTags.includes(tagText)));
 
       const queryValue = filterTags.join();
 
@@ -117,28 +129,28 @@ export default defineComponent({
     };
 
     return {
-      notes,
+      snippets,
       tag,
       tags,
-      notesFiltered,
+      snippetsFiltered,
       tagClicked,
 
       router,
 
-      projectName,
+      notebookName,
     };
   },
 });
 </script>
 
 <style scoped>
-#feed-list {
+#snippet-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.feed-filters {
+.snippet-filters {
   display: flex;
   justify-content: space-between;
   margin-top: 1em;
@@ -148,7 +160,7 @@ export default defineComponent({
   flex: 1;
 }
 
-.feed-item {
+.snippet-item {
   margin-top: 0.7em;
 }
 

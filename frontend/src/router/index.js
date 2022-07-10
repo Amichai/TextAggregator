@@ -1,17 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import ProjectBoard from '../components/ProjectBoard.vue';
-import ProjectsList from '../components/ProjectsList.vue';
+import notebookBoard from '../components/ProjectBoard.vue';
+import notebooksList from '../components/ProjectsList.vue';
 import NewSnippet from '../components/NewSnippet.vue';
 
 const routes = [
   {
-    path: '/project/:projectId',
-    name: 'Project',
-    component: ProjectBoard,
+    path: '/notebook/:notebookId',
+    name: 'notebook',
+    component: notebookBoard,
     props: true,
   },
   {
-    path: '/:projectId/NewSnippet',
+    path: '/:notebookId/NewSnippet',
     name: 'New Snippet',
     component: NewSnippet,
     props: true,
@@ -19,7 +19,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: ProjectsList,
+    component: notebooksList,
     props: true,
   },
 ];
