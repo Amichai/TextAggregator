@@ -17,6 +17,40 @@ def hello(event, context):
     return response
 
 
+def getNotebooks(event, context):
+    print("Get Notebooks")
+
+    print(event)
+
+    queryStringParameters = event['queryStringParameters']
+    print(queryStringParameters)
+
+    userId = queryStringParameters['userId']
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('TA_Users')
+
+    response = table.query(KeyConditionExpression=Key('userId').eq(userId))
+    items = response['Items']
+    print(items)
+    item = items[0]
+
+    ids = item['notebookIds'].split(',')
+
+    table = dynamodb.Table('TA_Notebooks')
+
+    to_return = []
+    for id in ids:
+        response = table.query(KeyConditionExpression=Key('notebookId').eq(id))
+        item = response['Items'][0]
+        to_return.append({
+            'id': id,
+            'name': item['name']
+        })
+
+    response = {"statusCode": 200, "body": json.dumps(to_return)}
+
+    return response
+
 def getNotebook(event, context):
     print("Get notebook")
 

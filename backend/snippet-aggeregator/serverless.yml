@@ -22,6 +22,8 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - arn:aws:dynamodb:us-east-1:276830396462:table/TA_Snippets
+            - arn:aws:dynamodb:us-east-1:276830396462:table/TA_Users
+            - arn:aws:dynamodb:us-east-1:276830396462:table/TA_Notebooks
 
   environment:
     TA_Snippets: TA_Snippets
@@ -47,6 +49,15 @@ functions:
       - httpApi:
           path: /getNotebook
           method: get
+  
+  getNotebooks:
+    handler: handler.getNotebooks
+    events:
+      - httpApi:
+          path: /getNotebooks
+          method: get
+
+  
 
 plugins:
   - serverless-python-requirements

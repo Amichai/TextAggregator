@@ -71,7 +71,6 @@ export default defineComponent({
 
   setup(props) {
     console.log(`notebook id4: ${props.notebookId}`);
-    console.log(`notebook id4: ${props.notebookId}`);
     const snippets = ref([]);
 
     fetch(
