@@ -21,7 +21,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const projectList = [
       {
-        name: 'project 1',
+        name: 'project 6',
         id: 123,
       },
       {

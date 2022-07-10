@@ -1,0 +1,53 @@
+org: amichaimlevy
+app: snippet-aggregator
+service: snippet-aggeregator
+frameworkVersion: '3'
+
+provider:
+  httpApi:
+    cors: true
+  name: aws
+  runtime: python3.8
+  stage: dev
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:us-east-1:276830396462:table/TA_Snippets
+
+  environment:
+    TA_Snippets: TA_Snippets
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+
+
+  newSnippet:
+    handler: handler.newSnippet
+    events:
+      - httpApi:
+          path: /newSnippet
+          method: post
+  
+  getNotebook:
+    handler: handler.getNotebook
+    events:
+      - httpApi:
+          path: /getNotebook
+          method: get
+
+plugins:
+  - serverless-python-requirements
