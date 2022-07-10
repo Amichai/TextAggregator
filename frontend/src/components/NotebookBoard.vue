@@ -3,7 +3,7 @@
     <PageNavbar />
     <div class="notebook-board">
       <EditableTitle v-model="notebookName" />
-      <NewSnippetButton
+      <NewItemButton
         :clickEvent="() => router.push(`/${notebookId}/NewSnippet`)"
       />
       <div class="snippet-filters">
@@ -53,15 +53,16 @@ import { computed, defineComponent, ref, watch } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRoute, useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
-import NewSnippetButton from './NewSnippetButton.vue';
+import NewItemButton from './NewItemButton.vue';
 import EditableTitle from './EditableTitle.vue';
 import SnippetItem from './SnippetItem.vue';
+import { getNotebook } from './../helpers/apiHelper'
 
 export default defineComponent({
   components: {
     VueTagsInput,
     PageNavbar,
-    NewSnippetButton,
+    NewItemButton,
     EditableTitle,
     SnippetItem,
   },
@@ -77,19 +78,15 @@ export default defineComponent({
     const snippets = ref([]);
     const notebookName = ref(' ');
 
-    fetch(
-      `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${props.notebookId}`
-    )
-      .then((response) => response.json())
-      .then((asJson) => {
-        notebookName.value = asJson.notebook.name;
-        snippets.value = asJson.snippets;
-        snippets.value.map(
-          (snippet) => (snippet.tags = snippet.tags.split(','))
-        );
+    getNotebook(props.notebookId).then(json => {
+      notebookName.value = json.notebook.name;
+      snippets.value = json.snippets;
+      snippets.value.map(
+        (snippet) => (snippet.tags = snippet.tags.split(','))
+      );
 
-        filterItems();
-      });
+      filterItems();
+    })
 
     // Query the notebook by id to get the notebok name and the list of snippets and users
 

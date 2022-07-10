@@ -1,18 +1,31 @@
 <template>
-  <div class="notebook-list">
-    <div v-for="notebook in notebookList" :key="notebook.id" class="notebook">
-      <a :href="`/notebook/${notebook.id}`">
-        {{ notebook.name }}
-      </a>
+  <div>
+    <PageNavbar />
+    <div class="notebook-list">
+      <div v-for="notebook in notebookList" :key="notebook.id" class="notebook">
+        <a :href="`/notebook/${notebook.id}`">
+          {{ notebook.name }}
+        </a>
+      </div>
+      <NewItemButton 
+      class="new-notebook"
+        :clickEvent="invokeNewNotebook"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import NewItemButton from './NewItemButton.vue';
+import PageNavbar from './PageNavbar.vue';
+import { getNotebooks, newNotebook } from './../helpers/apiHelper'
 
 export default defineComponent({
-  components: {},
+  components: {
+    NewItemButton,
+    PageNavbar,
+  },
 
   props: {},
 
@@ -24,17 +37,15 @@ export default defineComponent({
 
     const notebookList = ref([]);
 
-    fetch(
-      `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebooks?userId=${userId}`
-    )
-      .then((response) => response.json())
-      .then((asJson) => {
-        console.log(asJson);
-        notebookList.value = asJson;
-      });
+    getNotebooks(userId).then(json => notebookList.value = json)
+
+    const invokeNewNotebook = () => {
+      newNotebook('New Notebook!', uuid4())
+    }
 
     return {
       notebookList,
+      newNotebook,
     };
   },
 });
@@ -43,7 +54,6 @@ export default defineComponent({
 <style scoped>
 .notebook {
   margin: 1.5em 0 1.5em 1.5em;
-  /* padding: 1.5em;*/
   background-color: lightgray;
 
   padding: 1em;
@@ -55,5 +65,12 @@ export default defineComponent({
 
 .notebook-list {
   display: flex;
+  align-items: center;
+  padding: 0 8% 0 8%;
+
+}
+
+.new-notebook {
+  margin-left: 1em;
 }
 </style>

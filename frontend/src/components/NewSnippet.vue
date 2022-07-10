@@ -2,8 +2,9 @@
   <div>
     <PageNavbar />
     <div class="new-snippet">
+      Back to 
       <a class="link-primary" :href="`/notebook/${notebookId}`"
-        >Back to Notebook</a
+        >{{notebookName}}</a
       >
       <div>
         <EditableTitle v-model="snippetName" />
@@ -19,7 +20,7 @@
           statusbar: false,
           paste_block_drop: true,
           plugins: [],
-          toolbar: 'undo redo | bold italic | \
+          toolbar: 'bold italic | \
             outdent indent',
         }"
       />
@@ -30,7 +31,7 @@
         :tags="tags"
         @tags-changed="(newTags) => (tags = newTags)"
       />
-      <button type="button" class="btn btn-primary" @click="submitSnippet">
+      <button type="button" class="btn btn-primary submit-button" @click="submitSnippet">
         Submit
       </button>
     </div>
@@ -44,6 +45,7 @@ import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
 import EditableTitle from './EditableTitle.vue';
+import { getNotebookInfo, newSnippet } from './../helpers/apiHelper'
 
 export default defineComponent({
   components: {
@@ -64,6 +66,10 @@ export default defineComponent({
 
   setup(props, { emit }) {
     console.log(`notebook id: ${props.notebookId}`);
+    const notebookName = ref('')
+    
+    getNotebookInfo(props.notebookId).then(json => notebookName.value = json.name)
+
     const body = ref('');
     const tag = ref('');
     const tags = ref([]);
@@ -73,35 +79,11 @@ export default defineComponent({
     const snippetName = ref('');
 
     const submitSnippet = async () => {
-      const post = {
-        title: snippetName.value,
-        body: body.value,
-        tags: tags.value.map((tag) => tag.text).join(),
-        notebookId: props.notebookId,
-        userId: 'amichai',
-      };
-
-      const raw = JSON.stringify(post);
-
-      const requestOptions = {
-        method: 'POST',
-        body: raw,
-      };
-
-      try {
-        const response = await fetch(
-          'https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/newSnippet',
-          requestOptions
-        );
-        const data = await response.text();
-        console.log('Success', data);
+      newSnippet(snippetName.value, body.value, tags.value.map((tag) => tag.text).join(), props.notebookId, 'amichai').then(text => {
+        console.log('Success', text);
 
         router.push(`/notebook/${props.notebookId}`);
-        return true;
-      } catch (error) {
-        console.log('error', error);
-        return null;
-      }
+      })
     };
 
     return {
@@ -110,6 +92,7 @@ export default defineComponent({
       tags,
       snippetName,
       submitSnippet,
+      notebookName,
     };
   },
 });
@@ -122,5 +105,13 @@ export default defineComponent({
 
 .link-primary {
   cursor: pointer;
+}
+
+.vue-tags-input {
+  margin: 0.5em;
+}
+
+.submit-button {
+  margin: 0.5em;
 }
 </style>

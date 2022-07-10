@@ -42,6 +42,13 @@ functions:
       - httpApi:
           path: /newSnippet
           method: post
+  
+  newNotebook:
+    handler: handler.newNotebook
+    events:
+      - httpApi:
+          path: /newNotebook
+          method: post
 
   getNotebook:
     handler: handler.getNotebook
@@ -55,6 +62,13 @@ functions:
     events:
       - httpApi:
           path: /getNotebooks
+          method: get
+
+  getNotebookInfo:
+    handler: handler.getNotebookInfo
+    events:
+      - httpApi:
+          path: /getNotebookInfo
           method: get
 
 plugins:
