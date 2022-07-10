@@ -61,13 +61,22 @@ def getNotebook(event, context):
 
     notebookId = queryStringParameters['notebookId']
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('TA_Snippets')
+    snippetsTable = dynamodb.Table('TA_Snippets')
 
-    response = table.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
+    response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
     items = response['Items']
-    print(items)
 
-    response = {"statusCode": 200, "body": json.dumps(items)}
+    notebooksTable = dynamodb.Table('TA_Notebooks')
+    response = notebooksTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
+    notebook = response['Items'][0]
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps({
+            'notebook': notebook,
+            'snippets': items,
+            })
+    }
 
     return response
     

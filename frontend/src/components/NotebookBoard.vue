@@ -76,13 +76,15 @@ export default defineComponent({
   setup(props) {
     console.log(`notebook id: ${props.notebookId}`);
     const snippets = ref([]);
+    const notebookName = ref(' ');
 
     fetch(
       `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${props.notebookId}`
     )
       .then((response) => response.json())
       .then((asJson) => {
-        snippets.value = asJson;
+        notebookName.value = asJson.notebook.name
+        snippets.value = asJson.snippets;
         snippets.value.map(
           (snippet) => (snippet.tags = snippet.tags.split(','))
         );
@@ -98,7 +100,6 @@ export default defineComponent({
     const tag = ref('');
     const tags = ref([]);
 
-    const notebookName = ref('Notebook Name');
 
     const query = { ...route.query };
 
