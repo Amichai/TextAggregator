@@ -19,9 +19,7 @@
           statusbar: false,
           paste_block_drop: true,
           plugins: [],
-          toolbar:
-            'image | undo redo | link | bold italic | \
-            alignleft aligncenter alignright alignjustify | \
+          toolbar: 'undo redo | bold italic | \
             outdent indent',
         }"
       />

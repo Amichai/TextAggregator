@@ -5,11 +5,24 @@
     </h4>
     <br />
     <div v-html="snippet.body" />
+
+    <div class="footer">
+      <div class="tags-container" v-if="tags != undefined">
+        <p
+          v-for="tag in tags"
+          :key="tag"
+          :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
+          @click="tagClicked(tag)"
+        >
+          {{ tag }}
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   components: {},
@@ -19,12 +32,26 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    filterTags: {
+      type: Array,
+      required: true,
+    },
   },
 
-  emits: [],
+  emits: ['tagClicked'],
 
   setup(props, { emit }) {
-    return {};
+    const parsedTags = props.snippet.tags.filter((t) => t !== '');
+    const tags = ref(parsedTags);
+
+    const tagClicked = (tagText) => {
+      emit('tagClicked', tagText);
+    };
+
+    return {
+      tags,
+      tagClicked,
+    };
   },
 });
 </script>
@@ -39,5 +66,26 @@ export default defineComponent({
   border-width: 0.08em;
 }
 
+.footer {
+  display: flex;
+  align-items: center;
+}
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+.tag-p {
+  background: #5c6bc0;
+  color: white;
+  margin: 5px;
+  padding: 2.5px 10px 2.5px 10px;
+  border-radius: 3px;
+  font-size: 0.7em;
+  height: fit-content;
+  cursor: pointer;
+}
 
+.filter-tag {
+  background: rgb(208, 86, 72);
+}
 </style>

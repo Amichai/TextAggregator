@@ -49,15 +49,13 @@ functions:
       - httpApi:
           path: /getNotebook
           method: get
-  
+
   getNotebooks:
     handler: handler.getNotebooks
     events:
       - httpApi:
           path: /getNotebooks
           method: get
-
-  
 
 plugins:
   - serverless-python-requirements

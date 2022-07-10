@@ -11,8 +11,8 @@
           class="vue-tags-input"
           placeholder="Tag filters"
           v-model="tag"
-          :tags="tags"
-          @tags-changed="(newTags) => (tags = newTags)"
+          :tags="tagsWrapped"
+          @tags-changed="(newTags) => (tagsWrapped = newTags)"
         />
       </div>
 
@@ -22,7 +22,11 @@
           :key="snippet['userId-snippetId']"
           class="snippet-item"
         >
-          <SnippetItem :snippet="snippet" />
+          <SnippetItem
+            :snippet="snippet"
+            :filterTags="tags"
+            @tagClicked="tagClicked"
+          />
         </li>
       </ul>
       <div v-if="snippetsFiltered.length === 0 && snippets.length > 0">
@@ -46,7 +50,7 @@
 // search, tag filtering
 // collaborators
 // When clicked, display the content in a scrollable modal?
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRoute, useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
@@ -70,7 +74,7 @@ export default defineComponent({
   },
 
   setup(props) {
-    console.log(`notebook id4: ${props.notebookId}`);
+    console.log(`notebook id: ${props.notebookId}`);
     const snippets = ref([]);
 
     fetch(
@@ -78,10 +82,11 @@ export default defineComponent({
     )
       .then((response) => response.json())
       .then((asJson) => {
-        console.log(asJson);
         snippets.value = asJson;
+        snippets.value.map(
+          (snippet) => (snippet.tags = snippet.tags.split(','))
+        );
 
-        console.log('GG');
         filterItems();
       });
 
@@ -99,27 +104,20 @@ export default defineComponent({
 
     const path = window.location.pathname;
 
-    query.tags
-      ?.split(',')
-      .forEach((tagText) =>
-        tags.value.push({ text: tagText, tiClasses: ['ti-valid'] })
-      );
+    query.tags?.split(',').forEach((tagText) => tags.value.push(tagText));
     const snippetsFiltered = ref(snippets.value);
 
     const filterItems = () => {
       if (tags.value.length === 0) {
         snippetsFiltered.value = snippets.value;
         router.push({ path, query: {} });
-        console.log('---');
-        console.log(snippets.value);
-        console.log(snippetsFiltered.value);
         return;
       }
 
-      const filterTags = tags.value.map((tag) => tag.text);
+      const filterTags = tags.value;
       snippetsFiltered.value = snippets.value.filter((item) =>
         item.tags
-          .map((tag) => tag.text)
+          .map((tag) => tag)
           .some((tagText) => filterTags.includes(tagText))
       );
 
@@ -129,23 +127,34 @@ export default defineComponent({
     };
 
     const tagClicked = (tagText) => {
-      console.log(tags.value);
+      const selectedTags = tags.value.map((tag) => tag);
 
-      const selectedTags = tags.value.map((tag) => tag.text);
       if (selectedTags.includes(tagText)) {
-        tags.value = tags.value.filter((tag) => tag.text !== tagText);
+        tags.value = tags.value.filter((tag) => {
+          return tag !== tagText;
+        });
         filterItems();
         return;
       }
 
-      tags.value.push({ text: tagText, tiClasses: ['ti-valid'] });
+      tags.value.push(tagText);
       filterItems();
     };
+
+    const tagsWrapped = computed({
+      get: () => tags.value.map((tagText) => ({ text: tagText, tiClasses: ['ti-valid'] })),
+      set: (newTags) => tags.value = newTags.map(tag => tag.text) 
+    });
+      
+    watch(tags, (newVal, oldVal) => {
+      filterItems();
+    })
 
     return {
       snippets,
       tag,
       tags,
+      tagsWrapped,
       snippetsFiltered,
       tagClicked,
 

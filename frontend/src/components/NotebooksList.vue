@@ -20,9 +20,9 @@ export default defineComponent({
 
   setup(props, { emit }) {
     // query the database for a list of notebooks, ids and names - visiblity
-    const userId = 'amichai'
+    const userId = 'amichai';
 
-    const notebookList = ref([])
+    const notebookList = ref([]);
 
     fetch(
       `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebooks?userId=${userId}`
@@ -32,25 +32,6 @@ export default defineComponent({
         console.log(asJson);
         notebookList.value = asJson;
       });
-
-    // const notebookList = [
-    //   {
-    //     name: 'Notebook 13',
-    //     id: 123,
-    //   },
-    //   {
-    //     name: 'Notebook 2',
-    //     id: 124,
-    //   },
-    //   {
-    //     name: 'Notebook 3',
-    //     id: 125,
-    //   },
-    //   {
-    //     name: 'Notebook 4',
-    //     id: 128,
-    //   },
-    // ];
 
     return {
       notebookList,
