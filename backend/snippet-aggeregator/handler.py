@@ -119,9 +119,9 @@ def newNotebook(event, context):
     table = dynamodb.Table('TA_Notebooks')
 
     timestamp = getTimeStr()
-    notebookId = generateUUID()
     userId = body['userId']
     name = body['name']
+    notebookId = body['notebookId']
 
     to_write = {
         'notebookId': notebookId,
@@ -137,6 +137,21 @@ def newNotebook(event, context):
     )
 
     response = {"statusCode": 200, "body": json.dumps(result)}
+
+    users_table = dynamodb.Table('TA_Users')
+    response = users_table.query(KeyConditionExpression=Key('userId').eq(userId))
+    matchedUser = response['Items'][0]
+    notebookIds = matchedUser['notebookIds']
+
+    notebookIds += ",{}".format(notebookId)
+
+    users_table.update_item(
+        Key={'userId': userId},
+        UpdateExpression="set notebookIds = :i",
+         ExpressionAttributeValues={
+        ':i': notebookIds,
+    },
+    )
 
     return response
 
@@ -177,7 +192,25 @@ def newSnippet(event, context):
 
 
 if __name__ == "__main__":
-    newSnippet({}, {})
+
+    userId = 'amichai'
+    notebookId = '999'
+
+    dynamodb = boto3.resource('dynamodb')
+    users_table = dynamodb.Table('TA_Users')
+    response = users_table.query(KeyConditionExpression=Key('userId').eq(userId))
+    matchedUser = response['Items'][0]
+    notebookIds = matchedUser['notebookIds']
+
+    notebookIds += ",{}".format(notebookId)
+
+    users_table.update_item(
+        Key={'userId': userId},
+        UpdateExpression="set notebookIds = :i",
+         ExpressionAttributeValues={
+        ':i': notebookIds,
+    },
+    )
 
 # handlers for posting a new snippet
 # listing snippets - by project

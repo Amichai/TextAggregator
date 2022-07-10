@@ -20,6 +20,9 @@ import { defineComponent, ref } from 'vue';
 import NewItemButton from './NewItemButton.vue';
 import PageNavbar from './PageNavbar.vue';
 import { getNotebooks, newNotebook } from './../helpers/apiHelper'
+import { useRouter } from 'vue-router';
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default defineComponent({
   components: {
@@ -35,17 +38,21 @@ export default defineComponent({
     // query the database for a list of notebooks, ids and names - visiblity
     const userId = 'amichai';
 
+    const router = useRouter();
+
     const notebookList = ref([]);
 
     getNotebooks(userId).then(json => notebookList.value = json)
 
     const invokeNewNotebook = () => {
-      newNotebook('New Notebook!', uuid4())
+      const uuid = uuidv4().replaceAll('-', '');
+      newNotebook('New Notebook!', uuid, userId)
+      router.push(`/notebook/${uuid}`)
     }
 
     return {
       notebookList,
-      newNotebook,
+      invokeNewNotebook,
     };
   },
 });
