@@ -46,7 +46,6 @@ export default defineComponent({
   /* padding: 1.5em;*/
   background-color: lightgray;
 
-
   padding: 1em;
   border-radius: 0.3em;
   border-color: black;

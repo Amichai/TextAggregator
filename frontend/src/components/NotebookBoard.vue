@@ -15,7 +15,6 @@
           @tags-changed="(newTags) => (tagsWrapped = newTags)"
         />
       </div>
-
       <ul id="snippet-list">
         <li
           v-for="snippet in snippetsFiltered"
@@ -83,7 +82,7 @@ export default defineComponent({
     )
       .then((response) => response.json())
       .then((asJson) => {
-        notebookName.value = asJson.notebook.name
+        notebookName.value = asJson.notebook.name;
         snippets.value = asJson.snippets;
         snippets.value.map(
           (snippet) => (snippet.tags = snippet.tags.split(','))
@@ -99,7 +98,6 @@ export default defineComponent({
 
     const tag = ref('');
     const tags = ref([]);
-
 
     const query = { ...route.query };
 
@@ -143,13 +141,17 @@ export default defineComponent({
     };
 
     const tagsWrapped = computed({
-      get: () => tags.value.map((tagText) => ({ text: tagText, tiClasses: ['ti-valid'] })),
-      set: (newTags) => tags.value = newTags.map(tag => tag.text) 
+      get: () =>
+        tags.value.map((tagText) => ({
+          text: tagText,
+          tiClasses: ['ti-valid'],
+        })),
+      set: (newTags) => (tags.value = newTags.map((tag) => tag.text)),
     });
-      
+
     watch(tags, (newVal, oldVal) => {
       filterItems();
-    })
+    });
 
     return {
       snippets,
@@ -190,5 +192,9 @@ export default defineComponent({
 
 .notebook-board {
   padding: 0 18% 0 18%;
+}
+
+.notebook-menu {
+  display: flex;
 }
 </style>
