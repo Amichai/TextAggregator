@@ -42,9 +42,16 @@ export default defineComponent({
 
 <style scoped>
 .notebook {
-  margin: 1em;
-  padding: 1.5em;
+  margin: 1.5em 0 1.5em 1.5em;
+  /* padding: 1.5em;*/
   background-color: lightgray;
+
+
+  padding: 1em;
+  border-radius: 0.3em;
+  border-color: black;
+  border-style: solid;
+  border-width: 0.08em;
 }
 
 .notebook-list {
