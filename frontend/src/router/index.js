@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// import notebookBoard from '../components/ProjectBoard.vue';
-// import notebooksList from '../components/ProjectsList.vue';
 import notebookBoard from '../components/NotebookBoard.vue';
 import notebooksList from '../components/NotebooksList.vue';
 import NewSnippet from '../components/NewSnippet.vue';

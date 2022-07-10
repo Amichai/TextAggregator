@@ -22,7 +22,7 @@ export default defineComponent({
     // query the database for a list of notebooks, ids and names - visiblity
     const notebookList = [
       {
-        name: 'Notebook 11',
+        name: 'Notebook 13',
         id: 123,
       },
       {

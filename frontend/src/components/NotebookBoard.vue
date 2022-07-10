@@ -68,15 +68,16 @@ export default defineComponent({
 
   setup(props) {
     console.log(`notebook id4: ${props.notebookId}`);
+    console.log(`notebook id4: ${props.notebookId}`);
     const snippets = ref([]);
 
-    fetch(`https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${props.notebookId}`)
-      .then((response) => response.json())
-      .then((asJson) => {
-        console.log(asJson);
-        snippets.value = asJson.Items;
-        console.log("GG")
-      });
+    // fetch(`https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${props.notebookId}`)
+    //   .then((response) => response.json())
+    //   .then((asJson) => {
+    //     console.log(asJson);
+    //     snippets.value = asJson.Items;
+    //     console.log("GG")
+    //   });
 
     // Query the notebook by id to get the notebok name and the list of snippets and users
 
