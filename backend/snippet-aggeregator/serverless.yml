@@ -34,14 +34,13 @@ functions:
           path: /
           method: get
 
-
   newSnippet:
     handler: handler.newSnippet
     events:
       - httpApi:
           path: /newSnippet
           method: post
-  
+
   getNotebook:
     handler: handler.getNotebook
     events:

@@ -21,9 +21,13 @@ def getNotebook(event, context):
     print("Get notebook")
 
     print(event)
+
+    queryStringParameters = event['queryStringParameters']
+    print(queryStringParameters)
+
+    notebookId = queryStringParameters['notebookId']
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('TA_Snippets')
-    notebookId = '124'
 
     response = table.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
     items = response['Items']
@@ -51,6 +55,7 @@ def newSnippet(event, context):
     to_write = {
         'notebookId': notebookId,
         'userId-snippetId': '{}-{}'.format(userId, snippetId),
+        'userId': userId,
         'timestamp': timestamp,
         'title': body['title'],
         'body': body['body'],

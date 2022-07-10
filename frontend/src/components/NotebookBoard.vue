@@ -1,37 +1,40 @@
 <template>
-  <PageNavbar />
-  <div class="root">
-    <EditableTitle
-      v-model="notebookName"
-    />
-    <NewSnippetButton
-      :clickEvent="() => router.push(`/${notebookId}/NewSnippet`)"
-    />
-    <div class="snippet-filters">
-      <VueTagsInput
-        class="vue-tags-input"
-        placeholder="Tag filters"
-        v-model="tag"
-        :tags="tags"
-        @tags-changed="(newTags) => (tags = newTags)"
+  <div>
+    <PageNavbar />
+    <div class="notebook-board">
+      <EditableTitle v-model="notebookName" />
+      <NewSnippetButton
+        :clickEvent="() => router.push(`/${notebookId}/NewSnippet`)"
       />
-    </div>
+      <div class="snippet-filters">
+        <VueTagsInput
+          class="vue-tags-input"
+          placeholder="Tag filters"
+          v-model="tag"
+          :tags="tags"
+          @tags-changed="(newTags) => (tags = newTags)"
+        />
+      </div>
 
-    <ul id="snippet-list">
-      <li v-for="snippet in snippetsFiltered" :key="snippet.userId-snippetId" class="snippet-item">
-        <SnippetItem />
-      </li>
-
-    </ul>
-    <div v-if="snippetsFiltered.length === 0 && snippets.length > 0">
-      <br />
-      <br />
-      <i>No results match selected tag filters</i>
-    </div>
-    <div v-if="snippets.length === 0">
-      <br />
-      <br />
-      <i>No Snippets to show</i>
+      <ul id="snippet-list">
+        <li
+          v-for="snippet in snippetsFiltered"
+          :key="snippet['userId-snippetId']"
+          class="snippet-item"
+        >
+          <SnippetItem :snippet="snippet" />
+        </li>
+      </ul>
+      <div v-if="snippetsFiltered.length === 0 && snippets.length > 0">
+        <br />
+        <br />
+        <i>No results match selected tag filters</i>
+      </div>
+      <div v-if="snippets.length === 0">
+        <br />
+        <br />
+        <i>No Snippets to show</i>
+      </div>
     </div>
   </div>
 </template>
@@ -71,13 +74,17 @@ export default defineComponent({
     console.log(`notebook id4: ${props.notebookId}`);
     const snippets = ref([]);
 
-    // fetch(`https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${props.notebookId}`)
-    //   .then((response) => response.json())
-    //   .then((asJson) => {
-    //     console.log(asJson);
-    //     snippets.value = asJson.Items;
-    //     console.log("GG")
-    //   });
+    fetch(
+      `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${props.notebookId}`
+    )
+      .then((response) => response.json())
+      .then((asJson) => {
+        console.log(asJson);
+        snippets.value = asJson;
+
+        console.log('GG');
+        filterItems();
+      });
 
     // Query the notebook by id to get the notebok name and the list of snippets and users
 
@@ -95,20 +102,27 @@ export default defineComponent({
 
     query.tags
       ?.split(',')
-      .forEach((tagText) => tags.value.push({ text: tagText, tiClasses: ['ti-valid'] }));
+      .forEach((tagText) =>
+        tags.value.push({ text: tagText, tiClasses: ['ti-valid'] })
+      );
     const snippetsFiltered = ref(snippets.value);
 
     const filterItems = () => {
       if (tags.value.length === 0) {
-        snippetsFiltered.value = snippets;
+        snippetsFiltered.value = snippets.value;
         router.push({ path, query: {} });
+        console.log('---');
+        console.log(snippets.value);
+        console.log(snippetsFiltered.value);
         return;
       }
 
       const filterTags = tags.value.map((tag) => tag.text);
-      snippetsFiltered.value = snippets.value.filter((item) => item.tags
-        .map((tag) => tag.text)
-        .some((tagText) => filterTags.includes(tagText)));
+      snippetsFiltered.value = snippets.value.filter((item) =>
+        item.tags
+          .map((tag) => tag.text)
+          .some((tagText) => filterTags.includes(tagText))
+      );
 
       const queryValue = filterTags.join();
 
@@ -165,7 +179,7 @@ export default defineComponent({
   margin-top: 0.7em;
 }
 
-.root {
+.notebook-board {
   padding: 0 18% 0 18%;
 }
 </style>
