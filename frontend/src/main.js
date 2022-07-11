@@ -10,6 +10,7 @@ import { guard } from './helpers/guard';
 import 'bootstrap/dist/css/bootstrap.css';
 
 import 'bootstrap/dist/js/bootstrap';
+import 'bootstrap-icons/font/bootstrap-icons.css'
 
 const app = createApp(App);
 // Make sure to _use_ the router instance to make the

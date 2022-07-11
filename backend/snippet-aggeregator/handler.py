@@ -79,6 +79,34 @@ def getNotebook(event, context):
     }
 
     return response
+
+def getSnippet(event, context):
+    print("Get notebook")
+
+    print(event)
+
+    queryStringParameters = event['queryStringParameters']
+    print(queryStringParameters)
+
+    notebookId = queryStringParameters['notebookId']
+    snippetId = queryStringParameters['snippetId']
+    userId = queryStringParameters['userId']
+    userId_snippetId = "{}-{}".format(userId, snippetId)
+    dynamodb = boto3.resource('dynamodb')
+    snippetsTable = dynamodb.Table('TA_Snippets')
+
+    response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId)
+    & Key('userId-snippetId').eq(userId_snippetId)
+    )
+
+    item = response['Items'][0]
+
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(item)
+    }
+
+    return response
     
 def getNotebookInfo(event, context):
     print("Get notebook name")
@@ -192,12 +220,13 @@ def newSnippet(event, context):
     timestamp = getTimeStr()
     notebookId = body['notebookId']
     userId = body['userId']
-    snippetId = generateUUID()
+    snippetId = body['snippetId']
     
     to_write = {
         'notebookId': notebookId,
         'userId-snippetId': '{}-{}'.format(userId, snippetId),
         'userId': userId,
+        'snippetId': snippetId,
         'created': timestamp,
         'title': body['title'],
         'body': body['body'],
@@ -217,21 +246,19 @@ def newSnippet(event, context):
 
 if __name__ == "__main__":
 
+    notebookId = "5c5dcfe647794baabe7649da394cf5b4"
+    snippetId = "720c84b7d5754a6f80aad38d7432aae6"
+    userId = "amichai"
+    userId_snippetId = "{}-{}".format(userId, snippetId)
     dynamodb = boto3.resource('dynamodb')
+    snippetsTable = dynamodb.Table('TA_Snippets')
 
-    name = "new name!!"
-    notebookId = "08c7f6b5f9794386adffd92cd1090d7c"
+    response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId)
+    & Key('userId-snippetId').eq(userId_snippetId)
+    )
+    items = response['Items'][0]
 
-    notebooksTable = dynamodb.Table('TA_Notebooks')
-    result = notebooksTable.update_item(
-        Key={'notebookId': notebookId},
-        UpdateExpression="set #n = :i",
-         ExpressionAttributeValues={
-            ':i': name,
-        },
-        ExpressionAttributeNames={
-             "#n": "name"
-        })
+    print(items)
 
 # handlers for posting a new snippet
 # listing snippets - by project

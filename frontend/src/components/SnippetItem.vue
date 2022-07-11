@@ -1,9 +1,8 @@
 <template>
   <div class="snippet-item">
-    <h4>
+    <h4 v-if="snippet.title">
       {{ snippet.title }}
     </h4>
-    <br />
     <div v-html="snippet.body" />
 
     <div class="footer">
@@ -17,6 +16,12 @@
           {{ tag }}
         </p>
       </div>
+    </div>
+    <div class="edit-delete-snippet">
+      <a class="link-primary" >
+        Delete
+      </a>
+      <a class="link-primary" :href="`/${notebookId}/Snippet/${snippet.snippetId}`">Edit</a>
     </div>
   </div>
 </template>
@@ -36,6 +41,10 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    notebookId: {
+      type: String,
+      required: true,
+    }
   },
 
   emits: ['tagClicked'],
@@ -43,6 +52,8 @@ export default defineComponent({
   setup(props, { emit }) {
     const parsedTags = props.snippet.tags.filter((t) => t !== '');
     const tags = ref(parsedTags);
+
+    console.log(props.snippet)
 
     const tagClicked = (tagText) => {
       emit('tagClicked', tagText);
@@ -87,5 +98,14 @@ export default defineComponent({
 
 .filter-tag {
   background: rgb(208, 86, 72);
+}
+
+.edit-delete-snippet {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+a {
+  margin-right: 1em;
 }
 </style>

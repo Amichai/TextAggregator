@@ -6,7 +6,6 @@
         <a :href="`/notebook/${notebook.id}`">
           {{ notebook.name }}
         </a>
-        <TrashIcon />
       </div>
       <NewItemButton 
         class="new-notebook"
@@ -20,7 +19,6 @@
 import { defineComponent, ref } from 'vue';
 import NewItemButton from './NewItemButton.vue';
 import PageNavbar from './PageNavbar.vue';
-import TrashIcon from './TrashIcon.vue';
 import { getNotebooks, newNotebook } from './../helpers/apiHelper'
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
@@ -30,7 +28,6 @@ export default defineComponent({
   components: {
     NewItemButton,
     PageNavbar,
-    TrashIcon,
   },
 
   props: {},

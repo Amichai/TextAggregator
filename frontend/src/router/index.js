@@ -11,8 +11,8 @@ const routes = [
     props: true,
   },
   {
-    path: '/:notebookId/NewSnippet',
-    name: 'New Snippet',
+    path: '/:notebookId/Snippet/:snippetId',
+    name: 'Snippet',
     component: NewSnippet,
     props: true,
   },

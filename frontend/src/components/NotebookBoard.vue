@@ -7,7 +7,7 @@
       @blur="nameUpdated"
       />
       <NewItemButton
-        :clickEvent="() => router.push(`/${notebookId}/NewSnippet`)"
+        :clickEvent="() => router.push(`/${notebookId}/Snippet`)"
       />
       <div class="snippet-filters">
         <VueTagsInput
@@ -26,6 +26,7 @@
         >
           <SnippetItem
             :snippet="snippet"
+            :notebookId="notebookId"
             :filterTags="tags"
             @tagClicked="tagClicked"
           />

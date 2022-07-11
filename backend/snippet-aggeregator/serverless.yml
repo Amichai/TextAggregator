@@ -71,6 +71,13 @@ functions:
           path: /getNotebookInfo
           method: get
   
+  getSnippet:
+    handler: handler.getSnippet
+    events:
+      - httpApi:
+          path: /getSnippet
+          method: get
+  
   
   updateNotebook:
     handler: handler.updateNotebook

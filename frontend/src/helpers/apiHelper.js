@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export const getNotebooks = async (userId) => {
   const response = await fetch(
     `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebooks?userId=${userId}`
@@ -28,13 +30,24 @@ export const getNotebook = async (notebookId) => {
   return asJson
 }
 
-export const newSnippet = async (title, body, tags, notebookId, userId) => {
+export const getSnippet = async (notebookId, snippetId, userId) => {
+  const response = await fetch(
+    `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getSnippet?notebookId=${notebookId}&snippetId=${snippetId}&userId=${userId}`
+  )
+
+  const asJson = await response.json()
+
+  return asJson
+}
+
+export const newSnippet = async (title, body, tags, notebookId, userId, snippetId = undefined) => {
   const post = {
     title,
     body,
     tags,
     notebookId,
     userId,
+    snippetId: snippetId ?? uuidv4().replaceAll('-', ''),
   };
 
   const raw = JSON.stringify(post);
