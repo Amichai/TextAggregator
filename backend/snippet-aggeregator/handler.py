@@ -156,6 +156,30 @@ def newNotebook(event, context):
     return response
 
 
+def updateNotebook(event, context):
+    print("Update notebook")
+    print(event)
+    body = json.loads(event['body'])
+
+    notebookId = body['notebookId']
+    name = body['name']
+
+    dynamodb = boto3.resource('dynamodb')
+    notebooksTable = dynamodb.Table('TA_Notebooks')
+    result = notebooksTable.update_item(
+        Key={'notebookId': notebookId},
+        UpdateExpression="set #n = :i",
+         ExpressionAttributeValues={
+            ':i': name,
+        },
+        ExpressionAttributeNames={
+             "#n": "name"
+        })
+
+    response = {"statusCode": 200, "body": json.dumps(result)}
+    return response
+
+
 def newSnippet(event, context):
     print("NEW SNIPPET")
     print(event)
@@ -193,24 +217,21 @@ def newSnippet(event, context):
 
 if __name__ == "__main__":
 
-    userId = 'amichai'
-    notebookId = '999'
-
     dynamodb = boto3.resource('dynamodb')
-    users_table = dynamodb.Table('TA_Users')
-    response = users_table.query(KeyConditionExpression=Key('userId').eq(userId))
-    matchedUser = response['Items'][0]
-    notebookIds = matchedUser['notebookIds']
 
-    notebookIds += ",{}".format(notebookId)
+    name = "new name!!"
+    notebookId = "08c7f6b5f9794386adffd92cd1090d7c"
 
-    users_table.update_item(
-        Key={'userId': userId},
-        UpdateExpression="set notebookIds = :i",
+    notebooksTable = dynamodb.Table('TA_Notebooks')
+    result = notebooksTable.update_item(
+        Key={'notebookId': notebookId},
+        UpdateExpression="set #n = :i",
          ExpressionAttributeValues={
-        ':i': notebookIds,
-    },
-    )
+            ':i': name,
+        },
+        ExpressionAttributeNames={
+             "#n": "name"
+        })
 
 # handlers for posting a new snippet
 # listing snippets - by project

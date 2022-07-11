@@ -83,3 +83,29 @@ export const newNotebook = async (name, notebookId, userId) => {
     return null;
   }
 }
+
+export const updateNotebook = async (notebookId, name) => {
+  const post = {
+    name,
+    notebookId,
+  };
+
+  const raw = JSON.stringify(post);
+
+  const requestOptions = {
+    method: 'PUT',
+    body: raw,
+  };
+
+  try {
+    const response = await fetch(
+      'https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/updateNotebook',
+      requestOptions
+    );
+    const data = await response.text();
+    return data
+  } catch (error) {
+    console.log('error', error);
+    return null;
+  }
+}

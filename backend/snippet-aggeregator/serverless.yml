@@ -70,6 +70,14 @@ functions:
       - httpApi:
           path: /getNotebookInfo
           method: get
+  
+  
+  updateNotebook:
+    handler: handler.updateNotebook
+    events:
+      - httpApi:
+          path: /updateNotebook
+          method: put
 
 plugins:
   - serverless-python-requirements

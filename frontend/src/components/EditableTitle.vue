@@ -34,7 +34,7 @@ export default defineComponent({
     },
   },
 
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'blur'],
 
   setup(props, { emit }) {
     const modelValueModified = computed({
@@ -51,6 +51,10 @@ export default defineComponent({
         return;
       }
       isEditingTitle.value = isEditing;
+
+      if(!isEditingTitle.value) {
+        emit('blur');
+      }
     };
 
     return {

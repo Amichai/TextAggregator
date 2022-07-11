@@ -2,7 +2,10 @@
   <div>
     <PageNavbar />
     <div class="notebook-board">
-      <EditableTitle v-model="notebookName" />
+      <EditableTitle 
+      v-model="notebookName"
+      @blur="nameUpdated"
+      />
       <NewItemButton
         :clickEvent="() => router.push(`/${notebookId}/NewSnippet`)"
       />
@@ -56,7 +59,7 @@ import PageNavbar from './PageNavbar.vue';
 import NewItemButton from './NewItemButton.vue';
 import EditableTitle from './EditableTitle.vue';
 import SnippetItem from './SnippetItem.vue';
-import { getNotebook } from './../helpers/apiHelper'
+import { getNotebook, updateNotebook } from './../helpers/apiHelper'
 
 export default defineComponent({
   components: {
@@ -150,6 +153,10 @@ export default defineComponent({
       filterItems();
     });
 
+    const nameUpdated = () => {
+      updateNotebook(props.notebookId, notebookName.value)
+    }
+
     return {
       snippets,
       tag,
@@ -161,6 +168,8 @@ export default defineComponent({
       router,
 
       notebookName,
+
+      nameUpdated,
     };
   },
 });
