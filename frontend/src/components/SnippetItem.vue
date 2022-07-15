@@ -55,8 +55,6 @@ export default defineComponent({
     const parsedTags = props.snippet.tags.filter((t) => t !== '');
     const tags = ref(parsedTags);
 
-    console.log(props.snippet);
-
     const tagClicked = (tagText) => {
       emit('tagClicked', tagText);
     };

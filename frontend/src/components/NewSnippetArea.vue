@@ -2,7 +2,7 @@
   <div class="new-snippet-area">
     <div class="header-area" @click="toggleExpandCollapse">
       <h4>New Post</h4>
-      <div>
+      <div v-if="!isEditingExistingSnippet">
         <i class="bi bi-arrows-collapse" v-if="!isCollapsed"></i>
         <i class="bi bi-arrows-expand" v-if="isCollapsed"></i>
       </div>
@@ -53,16 +53,28 @@ export default defineComponent({
       type: String,
       default: '',
     },
+
+    isEditingExistingSnippet: {
+      type: Boolean,
+      default: false,
+    },
+
+    parentSnippet: {
+      type: Object,
+      required: false,
+    },
   },
 
   emits: ['snippetSubmitted'],
 
   setup(props, { emit }) {
-    const isCollapsed = ref(true);
-    const body = ref('');
+    const isCollapsed = ref(!props.isEditingExistingSnippet);
+    const body = ref(props.parentSnippet?.body ?? '');
     const tag = ref('');
-    const tags = ref([]);
-    const snippetName = ref('');
+    const tags = ref(
+      (props.parentSnippet?.tags ?? []).map((i) => ({ text: i }))
+    );
+    const snippetName = ref(props.parentSnippet?.title ?? '');
 
     const toggleExpandCollapse = () => {
       isCollapsed.value = !isCollapsed.value;

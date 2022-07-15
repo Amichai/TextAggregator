@@ -4,13 +4,6 @@
     <div class="notebook-board">
       <EditableTitle v-model="notebookName" @blur="nameUpdated" />
       <div class="snippet-filters">
-        <!-- <VueTagsInput
-          class="vue-tags-input"
-          placeholder="Tag filters"
-          v-model="tag"
-          :tags="tagsWrapped"
-          @tags-changed="(newTags) => (tagsWrapped = newTags)"
-        /> -->
         <div class="tags-container" v-if="allTags != undefined">
           <p
             v-for="tag in allTags"
@@ -34,10 +27,19 @@
           class="snippet-item"
         >
           <SnippetItem
+            v-if="snippet.snippetId !== editingSnippet.snippetId"
             :snippet="snippet"
             :notebookId="notebookId"
             :filterTags="tags"
             @tagClicked="tagClicked"
+          />
+          <NewSnippetArea
+            v-if="snippet.snippetId === editingSnippet.snippetId"
+            ref="snippetAreaRef"
+            :notebookId="notebookId"
+            @snippetSubmitted="snippetSubmitted"
+            :isEditingExistingSnippet="true"
+            :parentSnippet="snippet"
           />
         </li>
       </ul>
@@ -57,7 +59,6 @@
 
 <script>
 import { computed, defineComponent, ref, watch, onMounted } from 'vue';
-import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRoute, useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
 import NewItemButton from './NewItemButton.vue';
@@ -68,7 +69,6 @@ import { getNotebook, updateNotebook } from './../helpers/apiHelper';
 
 export default defineComponent({
   components: {
-    VueTagsInput,
     PageNavbar,
     NewItemButton,
     EditableTitle,
@@ -87,6 +87,7 @@ export default defineComponent({
     const snippets = ref([]);
     const notebookName = ref(' ');
     const allTags = ref([]);
+    const editingSnippet = ref(null);
 
     const loadNotebook = () => {
       getNotebook(props.notebookId).then((json) => {
@@ -95,6 +96,10 @@ export default defineComponent({
         snippets.value.map(
           (snippet) => (snippet.tags = snippet.tags.split(','))
         );
+
+        editingSnippet.value = snippets.value[0];
+        // console.log(editingSnippet.value.snippetId);
+        // debugger;
 
         const allTagsWithDuplicates = snippets.value.reduce(
           (previous, current) => {
@@ -203,6 +208,7 @@ export default defineComponent({
       nameUpdated,
       allTags,
       filterTags,
+      editingSnippet,
     };
   },
 });
