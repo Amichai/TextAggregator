@@ -12,7 +12,7 @@
         class="form-control"
         type="text"
         placeholder="Title"
-        v-model="snippetName"
+        v-model="title"
       />
       <textarea
         class="form-control text-area"
@@ -31,7 +31,14 @@
         class="btn btn-primary submit-button"
         @click="submitSnippet"
       >
-        Post
+        {{ isEditingExistingSnippet ? 'Save' : 'Post' }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary submit-button cancel-button"
+        @click="cancelChanges"
+      >
+        Cancel
       </button>
     </div>
   </div>
@@ -65,7 +72,7 @@ export default defineComponent({
     },
   },
 
-  emits: ['snippetSubmitted'],
+  emits: ['snippetSubmitted', 'cancelChanges'],
 
   setup(props, { emit }) {
     const isCollapsed = ref(!props.isEditingExistingSnippet);
@@ -74,16 +81,20 @@ export default defineComponent({
     const tags = ref(
       (props.parentSnippet?.tags ?? []).map((i) => ({ text: i }))
     );
-    const snippetName = ref(props.parentSnippet?.title ?? '');
+    const title = ref(props.parentSnippet?.title ?? '');
 
     const toggleExpandCollapse = () => {
       isCollapsed.value = !isCollapsed.value;
     };
 
+    const cancelChanges = () => {
+      emit('cancelChanges', props.parentSnippet);
+    };
+
     const submitSnippet = async () => {
       const snippetId = uuidv4().replaceAll('-', '');
       newSnippet(
-        snippetName.value ?? '',
+        title.value ?? '',
         body.value,
         tags.value.map((tag) => tag.text).join(),
         props.notebookId,
@@ -100,7 +111,7 @@ export default defineComponent({
       body.value = '';
       tag.value = '';
       tags.value = [];
-      snippetName.value = '';
+      title.value = '';
     };
 
     return {
@@ -108,11 +119,12 @@ export default defineComponent({
       body,
       tag,
       tags,
-      snippetName,
+      title,
       submitSnippet,
       toggleExpandCollapse,
 
       snippetPostSuccessCallback,
+      cancelChanges,
     };
   },
 });
@@ -140,5 +152,9 @@ export default defineComponent({
 .vue-tags-input {
   margin: 0.5em;
   width: 100%;
+}
+
+.cancel-button {
+  margin-left: 1em;
 }
 </style>

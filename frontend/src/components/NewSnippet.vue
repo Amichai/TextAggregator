@@ -7,7 +7,7 @@
         notebookName
       }}</a>
       <div>
-        <EditableTitle v-model="snippetName" />
+        <EditableTitle v-model="title" />
       </div>
       <Editor
         api-key="87di36sy23q93vwyyaopux8zr5pi3l3zqim8wr2029pg314f"
@@ -92,9 +92,9 @@ export default defineComponent({
 
     const router = useRouter();
 
-    const snippetName = ref('');
+    const title = ref('');
     getSnippet(props.notebookId, props.snippetId, 'amichai').then((json) => {
-      snippetName.value = json.name;
+      title.value = json.name;
       body.value = json.body;
       tags.value = json.tags.split(',').map((tagText) => ({
         text: tagText,
@@ -104,7 +104,7 @@ export default defineComponent({
 
     const submitSnippet = async () => {
       newSnippet(
-        snippetName.value ?? '',
+        title.value ?? '',
         body.value,
         tags.value.map((tag) => tag.text).join(),
         props.notebookId,
@@ -121,7 +121,7 @@ export default defineComponent({
       body,
       tag,
       tags,
-      snippetName,
+      title,
       submitSnippet,
       notebookName,
     };

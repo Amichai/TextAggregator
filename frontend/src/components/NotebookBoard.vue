@@ -27,14 +27,15 @@
           class="snippet-item"
         >
           <SnippetItem
-            v-if="snippet.snippetId !== editingSnippet.snippetId"
+            v-if="snippet.snippetId !== editingSnippet?.snippetId"
             :snippet="snippet"
             :notebookId="notebookId"
             :filterTags="tags"
             @tagClicked="tagClicked"
+            @editClicked="(s) => (editingSnippet = s)"
           />
           <NewSnippetArea
-            v-if="snippet.snippetId === editingSnippet.snippetId"
+            v-if="snippet.snippetId === editingSnippet?.snippetId"
             ref="snippetAreaRef"
             :notebookId="notebookId"
             @snippetSubmitted="snippetSubmitted"
@@ -97,9 +98,7 @@ export default defineComponent({
           (snippet) => (snippet.tags = snippet.tags.split(','))
         );
 
-        editingSnippet.value = snippets.value[0];
-        // console.log(editingSnippet.value.snippetId);
-        // debugger;
+        // editingSnippet.value = snippets.value[0];
 
         const allTagsWithDuplicates = snippets.value.reduce(
           (previous, current) => {

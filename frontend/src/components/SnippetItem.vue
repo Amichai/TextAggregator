@@ -19,12 +19,9 @@
     </div>
     <div class="edit-delete-snippet">
       <a class="link-primary"> Delete </a>
-      <a
-        class="link-primary"
-        :href="`/${notebookId}/Snippet/${snippet.snippetId}`"
-        >Edit</a
-      >
+      <a class="link-primary" @click="editClicked">Edit</a>
     </div>
+    <!-- :href="`/${notebookId}/Snippet/${snippet.snippetId}`" -->
   </div>
 </template>
 
@@ -49,7 +46,7 @@ export default defineComponent({
     },
   },
 
-  emits: ['tagClicked'],
+  emits: ['tagClicked', 'editClicked'],
 
   setup(props, { emit }) {
     const parsedTags = props.snippet.tags.filter((t) => t !== '');
@@ -59,9 +56,14 @@ export default defineComponent({
       emit('tagClicked', tagText);
     };
 
+    const editClicked = () => {
+      emit('editClicked', props.snippet);
+    };
+
     return {
       tags,
       tagClicked,
+      editClicked,
     };
   },
 });
