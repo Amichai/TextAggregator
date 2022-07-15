@@ -3,15 +3,19 @@
     <div class="header-area" @click="toggleExpandCollapse">
       <h4>New Post</h4>
       <div>
-        <i class="bi bi-arrows-collapse" 
-        v-if="!isCollapsed"></i>
-        <i class="bi bi-arrows-expand"
-          v-if="isCollapsed"></i>
+        <i class="bi bi-arrows-collapse" v-if="!isCollapsed"></i>
+        <i class="bi bi-arrows-expand" v-if="isCollapsed"></i>
       </div>
     </div>
     <div v-if="!isCollapsed">
-      <input class="form-control" type="text" placeholder="Title" v-model="snippetName" />
-      <textarea class="form-control text-area"
+      <input
+        class="form-control"
+        type="text"
+        placeholder="Title"
+        v-model="snippetName"
+      />
+      <textarea
+        class="form-control text-area"
         placeholder="New post here!"
         v-model="body"
       ></textarea>
@@ -22,7 +26,11 @@
         :tags="tags"
         @tags-changed="(newTags) => (tags = newTags)"
       />
-      <button type="button" class="btn btn-primary submit-button" @click="submitSnippet">
+      <button
+        type="button"
+        class="btn btn-primary submit-button"
+        @click="submitSnippet"
+      >
         Post
       </button>
     </div>
@@ -32,8 +40,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
-import { useRouter } from 'vue-router';
-import { newSnippet } from './../helpers/apiHelper'
+import { newSnippet } from './../helpers/apiHelper';
 import { v4 as uuidv4 } from 'uuid';
 
 export default defineComponent({
@@ -51,24 +58,37 @@ export default defineComponent({
   emits: ['snippetSubmitted'],
 
   setup(props, { emit }) {
-    const isCollapsed = ref(true)
+    const isCollapsed = ref(true);
     const body = ref('');
     const tag = ref('');
     const tags = ref([]);
     const snippetName = ref('');
-    const router = useRouter();
 
     const toggleExpandCollapse = () => {
       isCollapsed.value = !isCollapsed.value;
-    }
+    };
 
     const submitSnippet = async () => {
       const snippetId = uuidv4().replaceAll('-', '');
-      newSnippet(snippetName.value ?? '', body.value, tags.value.map((tag) => tag.text).join(), props.notebookId, 'amichai', snippetId).then(text => {
+      newSnippet(
+        snippetName.value ?? '',
+        body.value,
+        tags.value.map((tag) => tag.text).join(),
+        props.notebookId,
+        'amichai',
+        snippetId
+      ).then((text) => {
         console.log('Success', text);
 
-        emit('snippetSubmitted')
-      })
+        emit('snippetSubmitted');
+      });
+    };
+
+    const snippetPostSuccessCallback = () => {
+      body.value = '';
+      tag.value = '';
+      tags.value = [];
+      snippetName.value = '';
     };
 
     return {
@@ -79,6 +99,8 @@ export default defineComponent({
       snippetName,
       submitSnippet,
       toggleExpandCollapse,
+
+      snippetPostSuccessCallback,
     };
   },
 });
@@ -87,7 +109,7 @@ export default defineComponent({
 <style scoped>
 .new-snippet-area {
   background-color: lightgray;
-  padding:1em;
+  padding: 1em;
   border-radius: 0.5em;
 }
 

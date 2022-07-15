@@ -2,13 +2,7 @@
   <div>
     <PageNavbar />
     <div class="notebook-board">
-      <EditableTitle 
-      v-model="notebookName"
-      @blur="nameUpdated"
-      />
-      <NewItemButton
-        :clickEvent="() => router.push(`/${notebookId}/Snippet`)"
-      />
+      <EditableTitle v-model="notebookName" @blur="nameUpdated" />
       <div class="snippet-filters">
         <VueTagsInput
           class="vue-tags-input"
@@ -18,7 +12,8 @@
           @tags-changed="(newTags) => (tagsWrapped = newTags)"
         />
       </div>
-      <NewSnippetArea 
+      <NewSnippetArea
+        ref="snippetAreaRef"
         :notebookId="notebookId"
         @snippetSubmitted="snippetSubmitted"
       />
@@ -51,7 +46,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch, onMounted } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRoute, useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
@@ -59,7 +54,7 @@ import NewItemButton from './NewItemButton.vue';
 import EditableTitle from './EditableTitle.vue';
 import SnippetItem from './SnippetItem.vue';
 import NewSnippetArea from './NewSnippetArea.vue';
-import { getNotebook, updateNotebook } from './../helpers/apiHelper'
+import { getNotebook, updateNotebook } from './../helpers/apiHelper';
 
 export default defineComponent({
   components: {
@@ -83,7 +78,7 @@ export default defineComponent({
     const notebookName = ref(' ');
 
     const loadNotebook = () => {
-      getNotebook(props.notebookId).then(json => {
+      getNotebook(props.notebookId).then((json) => {
         notebookName.value = json.notebook.name;
         snippets.value = json.snippets;
         snippets.value.map(
@@ -91,8 +86,14 @@ export default defineComponent({
         );
 
         filterItems();
-      })
-    }
+
+        if (snippetAreaRef.value) {
+          snippetAreaRef.value.snippetPostSuccessCallback();
+        }
+      });
+    };
+
+    const snippetAreaRef = ref(null);
 
     loadNotebook();
 
@@ -130,7 +131,7 @@ export default defineComponent({
 
     const snippetSubmitted = () => {
       loadNotebook();
-    }
+    };
 
     const tagClicked = (tagText) => {
       const selectedTags = tags.value.map((tag) => tag);
@@ -161,8 +162,8 @@ export default defineComponent({
     });
 
     const nameUpdated = () => {
-      updateNotebook(props.notebookId, notebookName.value)
-    }
+      updateNotebook(props.notebookId, notebookName.value);
+    };
 
     return {
       snippets,
@@ -172,11 +173,9 @@ export default defineComponent({
       snippetsFiltered,
       tagClicked,
       snippetSubmitted,
-
+      snippetAreaRef,
       router,
-
       notebookName,
-
       nameUpdated,
     };
   },

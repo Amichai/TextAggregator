@@ -7,10 +7,7 @@
           {{ notebook.name }}
         </a>
       </div>
-      <NewItemButton 
-        class="new-notebook"
-        :clickEvent="invokeNewNotebook"
-      />
+      <NewItemButton class="new-notebook" :clickEvent="invokeNewNotebook" />
     </div>
   </div>
 </template>
@@ -19,10 +16,9 @@
 import { defineComponent, ref } from 'vue';
 import NewItemButton from './NewItemButton.vue';
 import PageNavbar from './PageNavbar.vue';
-import { getNotebooks, newNotebook } from './../helpers/apiHelper'
+import { getNotebooks, newNotebook } from './../helpers/apiHelper';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-
 
 export default defineComponent({
   components: {
@@ -42,13 +38,13 @@ export default defineComponent({
 
     const notebookList = ref([]);
 
-    getNotebooks(userId).then(json => notebookList.value = json)
+    getNotebooks(userId).then((json) => (notebookList.value = json));
 
     const invokeNewNotebook = () => {
       const uuid = uuidv4().replaceAll('-', '');
-      newNotebook('New Notebook!', uuid, userId)
-      router.push(`/notebook/${uuid}`)
-    }
+      newNotebook('New Notebook!', uuid, userId);
+      router.push(`/notebook/${uuid}`);
+    };
 
     return {
       notebookList,
@@ -74,8 +70,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   padding: 0 8% 0 8%;
-  flex-wrap: wrap
-
+  flex-wrap: wrap;
 }
 
 .new-notebook {

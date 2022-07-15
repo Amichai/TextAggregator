@@ -52,7 +52,7 @@ export default defineComponent({
       }
       isEditingTitle.value = isEditing;
 
-      if(!isEditingTitle.value) {
+      if (!isEditingTitle.value) {
         emit('blur');
       }
     };

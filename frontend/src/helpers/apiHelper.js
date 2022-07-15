@@ -3,43 +3,50 @@ import { v4 as uuidv4 } from 'uuid';
 export const getNotebooks = async (userId) => {
   const response = await fetch(
     `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebooks?userId=${userId}`
-  )
+  );
 
-  const asJson = await response.json()
+  const asJson = await response.json();
 
-  return asJson
-}
+  return asJson;
+};
 
 export const getNotebookInfo = async (notebookId) => {
   const response = await fetch(
     `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebookInfo?notebookId=${notebookId}`
-  )
+  );
 
-  const asJson = await response.json()
+  const asJson = await response.json();
 
-  return asJson
-}
+  return asJson;
+};
 
 export const getNotebook = async (notebookId) => {
   const response = await fetch(
     `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${notebookId}`
-  )
+  );
 
-  const asJson = await response.json()
-  return asJson
-}
+  const asJson = await response.json();
+  return asJson;
+};
 
 export const getSnippet = async (notebookId, snippetId, userId) => {
   const response = await fetch(
     `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getSnippet?notebookId=${notebookId}&snippetId=${snippetId}&userId=${userId}`
-  )
+  );
 
-  const asJson = await response.json()
+  const asJson = await response.json();
 
-  return asJson
-}
+  return asJson;
+};
 
-export const newSnippet = async (title, body, tags, notebookId, userId, snippetId = undefined) => {
+export const newSnippet = async (
+  title,
+  body,
+  tags,
+  notebookId,
+  userId,
+  snippetId = undefined
+) => {
   const post = {
     title,
     body,
@@ -62,12 +69,12 @@ export const newSnippet = async (title, body, tags, notebookId, userId, snippetI
       requestOptions
     );
     const data = await response.text();
-    return data
+    return data;
   } catch (error) {
     console.log('error', error);
     return null;
   }
-}
+};
 
 export const newNotebook = async (name, notebookId, userId) => {
   const post = {
@@ -89,12 +96,12 @@ export const newNotebook = async (name, notebookId, userId) => {
       requestOptions
     );
     const data = await response.text();
-    return data
+    return data;
   } catch (error) {
     console.log('error', error);
     return null;
   }
-}
+};
 
 export const updateNotebook = async (notebookId, name) => {
   const post = {
@@ -115,9 +122,9 @@ export const updateNotebook = async (notebookId, name) => {
       requestOptions
     );
     const data = await response.text();
-    return data
+    return data;
   } catch (error) {
     console.log('error', error);
     return null;
   }
-}
+};

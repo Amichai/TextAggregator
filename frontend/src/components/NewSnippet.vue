@@ -2,10 +2,10 @@
   <div>
     <PageNavbar />
     <div class="new-snippet">
-      Back to 
-      <a class="link-primary" :href="`/notebook/${notebookId}`"
-        >{{notebookName}}</a
-      >
+      Back to
+      <a class="link-primary" :href="`/notebook/${notebookId}`">{{
+        notebookName
+      }}</a>
       <div>
         <EditableTitle v-model="snippetName" />
       </div>
@@ -31,7 +31,11 @@
         :tags="tags"
         @tags-changed="(newTags) => (tags = newTags)"
       />
-      <button type="button" class="btn btn-primary submit-button" @click="submitSnippet">
+      <button
+        type="button"
+        class="btn btn-primary submit-button"
+        @click="submitSnippet"
+      >
         Submit
       </button>
     </div>
@@ -45,7 +49,11 @@ import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRouter } from 'vue-router';
 import PageNavbar from './PageNavbar.vue';
 import EditableTitle from './EditableTitle.vue';
-import { getNotebookInfo, newSnippet, getSnippet } from './../helpers/apiHelper'
+import {
+  getNotebookInfo,
+  newSnippet,
+  getSnippet,
+} from './../helpers/apiHelper';
 
 export default defineComponent({
   components: {
@@ -71,13 +79,12 @@ export default defineComponent({
   setup(props, { emit }) {
     console.log(`notebook id: ${props.notebookId}`);
     console.log(`snippet id: ${props.snippetId}`);
-    const notebookName = ref('')
-    
-    getNotebookInfo(props.notebookId).then(json => {
-      notebookName.value = json.name
-      console.log(json)
-    })
+    const notebookName = ref('');
 
+    getNotebookInfo(props.notebookId).then((json) => {
+      notebookName.value = json.name;
+      console.log(json);
+    });
 
     const body = ref('');
     const tag = ref('');
@@ -86,21 +93,28 @@ export default defineComponent({
     const router = useRouter();
 
     const snippetName = ref('');
-    getSnippet(props.notebookId, props.snippetId, 'amichai').then(json => {
+    getSnippet(props.notebookId, props.snippetId, 'amichai').then((json) => {
       snippetName.value = json.name;
       body.value = json.body;
       tags.value = json.tags.split(',').map((tagText) => ({
-          text: tagText,
-          tiClasses: ['ti-valid'],
-        }));
-    })
+        text: tagText,
+        tiClasses: ['ti-valid'],
+      }));
+    });
 
     const submitSnippet = async () => {
-      newSnippet(snippetName.value ?? '', body.value, tags.value.map((tag) => tag.text).join(), props.notebookId, 'amichai', props.snippetId).then(text => {
+      newSnippet(
+        snippetName.value ?? '',
+        body.value,
+        tags.value.map((tag) => tag.text).join(),
+        props.notebookId,
+        'amichai',
+        props.snippetId
+      ).then((text) => {
         console.log('Success', text);
 
         router.push(`/notebook/${props.notebookId}`);
-      })
+      });
     };
 
     return {
