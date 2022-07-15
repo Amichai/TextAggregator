@@ -66,9 +66,12 @@ def getNotebook(event, context):
     response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
     items = response['Items']
 
+    items = sorted(items, key=lambda a: a['created'], reverse=True)
+
     notebooksTable = dynamodb.Table('TA_Notebooks')
     response = notebooksTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
     notebook = response['Items'][0]
+
 
     response = {
         "statusCode": 200,
@@ -249,17 +252,18 @@ if __name__ == "__main__":
     notebookId = "5c5dcfe647794baabe7649da394cf5b4"
     snippetId = "720c84b7d5754a6f80aad38d7432aae6"
     userId = "amichai"
-    userId_snippetId = "{}-{}".format(userId, snippetId)
-    dynamodb = boto3.resource('dynamodb')
-    snippetsTable = dynamodb.Table('TA_Snippets')
 
-    response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId)
-    & Key('userId-snippetId').eq(userId_snippetId)
-    )
-    items = response['Items'][0]
+    # queryStringParameters = event['queryStringParameters']
+    # notebookId = queryStringParameters['notebookId']
 
-    print(items)
+    result = getNotebook({'queryStringParameters': {'notebookId': notebookId}}, {})
 
+    result = json.loads(result['body'])
+    print(result)
+    print(result.keys())
+    result = result['snippets']
+    dates = [a['created'] for a in result]
+    print(dates)
 # handlers for posting a new snippet
 # listing snippets - by project
 # editing a snippet

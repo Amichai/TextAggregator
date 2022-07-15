@@ -18,6 +18,10 @@
           @tags-changed="(newTags) => (tagsWrapped = newTags)"
         />
       </div>
+      <NewSnippetArea 
+        :notebookId="notebookId"
+        @snippetSubmitted="snippetSubmitted"
+      />
       <ul id="snippet-list">
         <li
           v-for="snippet in snippetsFiltered"
@@ -47,12 +51,6 @@
 </template>
 
 <script>
-// This view is similar to keep
-// A rich editor at the top to create a note
-// a list of snippets + tags
-// search, tag filtering
-// collaborators
-// When clicked, display the content in a scrollable modal?
 import { computed, defineComponent, ref, watch } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import { useRoute, useRouter } from 'vue-router';
@@ -60,6 +58,7 @@ import PageNavbar from './PageNavbar.vue';
 import NewItemButton from './NewItemButton.vue';
 import EditableTitle from './EditableTitle.vue';
 import SnippetItem from './SnippetItem.vue';
+import NewSnippetArea from './NewSnippetArea.vue';
 import { getNotebook, updateNotebook } from './../helpers/apiHelper'
 
 export default defineComponent({
@@ -69,6 +68,7 @@ export default defineComponent({
     NewItemButton,
     EditableTitle,
     SnippetItem,
+    NewSnippetArea,
   },
   props: {
     notebookId: {
@@ -82,17 +82,19 @@ export default defineComponent({
     const snippets = ref([]);
     const notebookName = ref(' ');
 
-    getNotebook(props.notebookId).then(json => {
-      notebookName.value = json.notebook.name;
-      snippets.value = json.snippets;
-      snippets.value.map(
-        (snippet) => (snippet.tags = snippet.tags.split(','))
-      );
+    const loadNotebook = () => {
+      getNotebook(props.notebookId).then(json => {
+        notebookName.value = json.notebook.name;
+        snippets.value = json.snippets;
+        snippets.value.map(
+          (snippet) => (snippet.tags = snippet.tags.split(','))
+        );
 
-      filterItems();
-    })
+        filterItems();
+      })
+    }
 
-    // Query the notebook by id to get the notebok name and the list of snippets and users
+    loadNotebook();
 
     const route = useRoute();
     const router = useRouter();
@@ -125,6 +127,10 @@ export default defineComponent({
 
       router.push({ path, query: { tags: queryValue } });
     };
+
+    const snippetSubmitted = () => {
+      loadNotebook();
+    }
 
     const tagClicked = (tagText) => {
       const selectedTags = tags.value.map((tag) => tag);
@@ -165,6 +171,7 @@ export default defineComponent({
       tagsWrapped,
       snippetsFiltered,
       tagClicked,
+      snippetSubmitted,
 
       router,
 

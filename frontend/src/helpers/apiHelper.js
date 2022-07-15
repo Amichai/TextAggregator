@@ -26,7 +26,6 @@ export const getNotebook = async (notebookId) => {
   )
 
   const asJson = await response.json()
-
   return asJson
 }
 
