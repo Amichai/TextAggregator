@@ -4,13 +4,23 @@
     <div class="notebook-board">
       <EditableTitle v-model="notebookName" @blur="nameUpdated" />
       <div class="snippet-filters">
-        <VueTagsInput
+        <!-- <VueTagsInput
           class="vue-tags-input"
           placeholder="Tag filters"
           v-model="tag"
           :tags="tagsWrapped"
           @tags-changed="(newTags) => (tagsWrapped = newTags)"
-        />
+        /> -->
+        <div class="tags-container" v-if="allTags != undefined">
+          <p
+            v-for="tag in allTags"
+            :key="tag"
+            @click="tagClicked(tag)"
+            :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
+          >
+            {{ tag }}
+          </p>
+        </div>
       </div>
       <NewSnippetArea
         ref="snippetAreaRef"
@@ -76,6 +86,7 @@ export default defineComponent({
     console.log(`notebook id: ${props.notebookId}`);
     const snippets = ref([]);
     const notebookName = ref(' ');
+    const allTags = ref([]);
 
     const loadNotebook = () => {
       getNotebook(props.notebookId).then((json) => {
@@ -84,6 +95,18 @@ export default defineComponent({
         snippets.value.map(
           (snippet) => (snippet.tags = snippet.tags.split(','))
         );
+
+        const allTagsWithDuplicates = snippets.value.reduce(
+          (previous, current) => {
+            return [...previous, ...current.tags];
+          },
+          []
+        );
+
+        allTags.value = [...new Set(allTagsWithDuplicates)].filter((t) => t);
+
+        console.log('All tags!!');
+        console.log(allTags);
 
         filterItems();
 
@@ -102,6 +125,7 @@ export default defineComponent({
 
     const tag = ref('');
     const tags = ref([]);
+    const filterTags = ref([]);
 
     const query = { ...route.query };
 
@@ -117,14 +141,14 @@ export default defineComponent({
         return;
       }
 
-      const filterTags = tags.value;
+      filterTags.value = tags.value;
       snippetsFiltered.value = snippets.value.filter((item) =>
         item.tags
           .map((tag) => tag)
-          .some((tagText) => filterTags.includes(tagText))
+          .some((tagText) => filterTags.value.includes(tagText))
       );
 
-      const queryValue = filterTags.join();
+      const queryValue = filterTags.value.join();
 
       router.push({ path, query: { tags: queryValue } });
     };
@@ -177,6 +201,8 @@ export default defineComponent({
       router,
       notebookName,
       nameUpdated,
+      allTags,
+      filterTags,
     };
   },
 });
@@ -209,5 +235,25 @@ export default defineComponent({
 
 .notebook-menu {
   display: flex;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag-p {
+  background: #5c6bc0;
+  color: white;
+  margin: 5px;
+  padding: 2.5px 10px 2.5px 10px;
+  border-radius: 3px;
+  font-size: 0.7em;
+  height: fit-content;
+  cursor: pointer;
+}
+
+.filter-tag {
+  background: rgb(208, 86, 72);
 }
 </style>
