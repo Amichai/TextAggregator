@@ -1,8 +1,12 @@
 <template>
   <div class="new-snippet-area">
-    <div class="header-area" @click="toggleExpandCollapse">
+    <div
+      class="header-area"
+      @click="toggleExpandCollapse"
+      v-if="!isEditingExistingSnippet"
+    >
       <h4>New Post</h4>
-      <div v-if="!isEditingExistingSnippet">
+      <div>
         <i class="bi bi-arrows-collapse" v-if="!isCollapsed"></i>
         <i class="bi bi-arrows-expand" v-if="isCollapsed"></i>
       </div>
@@ -66,7 +70,7 @@ export default defineComponent({
       default: false,
     },
 
-    parentSnippet: {
+    snippet: {
       type: Object,
       required: false,
     },
@@ -76,23 +80,24 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const isCollapsed = ref(!props.isEditingExistingSnippet);
-    const body = ref(props.parentSnippet?.body ?? '');
+    const body = ref(props.snippet?.body ?? '');
     const tag = ref('');
     const tags = ref(
-      (props.parentSnippet?.tags ?? []).map((i) => ({ text: i }))
+      (props.snippet?.tags ?? []).filter((i) => i).map((i) => ({ text: i }))
     );
-    const title = ref(props.parentSnippet?.title ?? '');
+    const title = ref(props.snippet?.title ?? '');
 
     const toggleExpandCollapse = () => {
       isCollapsed.value = !isCollapsed.value;
     };
 
     const cancelChanges = () => {
-      emit('cancelChanges', props.parentSnippet);
+      emit('cancelChanges', props.snippet);
     };
 
     const submitSnippet = async () => {
-      const snippetId = uuidv4().replaceAll('-', '');
+      const snippetId =
+        props.snippet?.snippetId ?? uuidv4().replaceAll('-', '');
       newSnippet(
         title.value ?? '',
         body.value,
@@ -104,14 +109,12 @@ export default defineComponent({
         console.log('Success', text);
 
         emit('snippetSubmitted');
-      });
-    };
 
-    const snippetPostSuccessCallback = () => {
-      body.value = '';
-      tag.value = '';
-      tags.value = [];
-      title.value = '';
+        body.value = '';
+        tag.value = '';
+        tags.value = [];
+        title.value = '';
+      });
     };
 
     return {
@@ -123,7 +126,6 @@ export default defineComponent({
       submitSnippet,
       toggleExpandCollapse,
 
-      snippetPostSuccessCallback,
       cancelChanges,
     };
   },

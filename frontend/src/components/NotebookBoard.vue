@@ -16,7 +16,6 @@
         </div>
       </div>
       <NewSnippetArea
-        ref="snippetAreaRef"
         :notebookId="notebookId"
         @snippetSubmitted="snippetSubmitted"
       />
@@ -36,11 +35,11 @@
           />
           <NewSnippetArea
             v-if="snippet.snippetId === editingSnippet?.snippetId"
-            ref="snippetAreaRef"
             :notebookId="notebookId"
             @snippetSubmitted="snippetSubmitted"
+            @cancelChanges="cancelChanges"
             :isEditingExistingSnippet="true"
-            :parentSnippet="snippet"
+            :snippet="snippet"
           />
         </li>
       </ul>
@@ -98,8 +97,6 @@ export default defineComponent({
           (snippet) => (snippet.tags = snippet.tags.split(','))
         );
 
-        // editingSnippet.value = snippets.value[0];
-
         const allTagsWithDuplicates = snippets.value.reduce(
           (previous, current) => {
             return [...previous, ...current.tags];
@@ -108,19 +105,14 @@ export default defineComponent({
         );
 
         allTags.value = [...new Set(allTagsWithDuplicates)].filter((t) => t);
+        allTags.value.sort();
 
         console.log('All tags!!');
         console.log(allTags);
 
         filterItems();
-
-        if (snippetAreaRef.value) {
-          snippetAreaRef.value.snippetPostSuccessCallback();
-        }
       });
     };
-
-    const snippetAreaRef = ref(null);
 
     loadNotebook();
 
@@ -159,6 +151,8 @@ export default defineComponent({
 
     const snippetSubmitted = () => {
       loadNotebook();
+
+      editingSnippet.value = undefined;
     };
 
     const tagClicked = (tagText) => {
@@ -193,6 +187,10 @@ export default defineComponent({
       updateNotebook(props.notebookId, notebookName.value);
     };
 
+    const cancelChanges = () => {
+      editingSnippet.value = undefined;
+    };
+
     return {
       snippets,
       tag,
@@ -201,13 +199,13 @@ export default defineComponent({
       snippetsFiltered,
       tagClicked,
       snippetSubmitted,
-      snippetAreaRef,
       router,
       notebookName,
       nameUpdated,
       allTags,
       filterTags,
       editingSnippet,
+      cancelChanges,
     };
   },
 });
