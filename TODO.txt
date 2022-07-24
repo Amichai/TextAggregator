@@ -1,0 +1,7 @@
+TODO:
+
+ * - Sort all filter tags alphabetically
+ - Editng tags on  snippet doesn't update until refresh
+ - Sort by createdAt, not modified date! 
+ User table, auth0 integration
+ * - Delete functionality 

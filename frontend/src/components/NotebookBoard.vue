@@ -29,9 +29,11 @@
             v-if="snippet.snippetId !== editingSnippet?.snippetId"
             :snippet="snippet"
             :notebookId="notebookId"
+            userId="amichai"
             :filterTags="tags"
             @tagClicked="tagClicked"
             @editClicked="(s) => (editingSnippet = s)"
+            @deleteClicked="loadNotebook"
           />
           <NewSnippetArea
             v-if="snippet.snippetId === editingSnippet?.snippetId"
@@ -206,6 +208,7 @@ export default defineComponent({
       filterTags,
       editingSnippet,
       cancelChanges,
+      loadNotebook,
     };
   },
 });
@@ -234,6 +237,7 @@ export default defineComponent({
 
 .notebook-board {
   padding: 0 18% 0 18%;
+  padding-bottom: 4em;
 }
 
 .notebook-menu {

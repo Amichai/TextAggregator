@@ -42,7 +42,7 @@ functions:
       - httpApi:
           path: /newSnippet
           method: post
-  
+
   newNotebook:
     handler: handler.newNotebook
     events:
@@ -70,21 +70,27 @@ functions:
       - httpApi:
           path: /getNotebookInfo
           method: get
-  
+
   getSnippet:
     handler: handler.getSnippet
     events:
       - httpApi:
           path: /getSnippet
           method: get
-  
-  
+
   updateNotebook:
     handler: handler.updateNotebook
     events:
       - httpApi:
           path: /updateNotebook
           method: put
+
+  deleteSnippet:
+    handler: handler.deleteSnippet
+    events:
+      - httpApi:
+          path: /deleteSnippet
+          method: DELETE
 
 plugins:
   - serverless-python-requirements

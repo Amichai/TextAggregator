@@ -76,6 +76,24 @@ export const newSnippet = async (
   }
 };
 
+export const deleteSnippet = async (notebookId, userId, snippetId) => {
+  const requestOptions = {
+    method: 'DELETE',
+  };
+
+  try {
+    const response = await fetch(
+      `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/deleteSnippet?notebookId=${notebookId}&userId=${userId}&snippetId=${snippetId}`,
+      requestOptions
+    );
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    console.log('error', error);
+    return null;
+  }
+};
+
 export const newNotebook = async (name, notebookId, userId) => {
   const post = {
     name,

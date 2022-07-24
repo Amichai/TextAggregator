@@ -1,5 +1,10 @@
 <template>
-  <div class="new-snippet-area">
+  <div
+    :class="[
+      'new-snippet-area',
+      isEditingExistingSnippet && 'new-snippet-area-editing',
+    ]"
+  >
     <div
       class="header-area"
       @click="toggleExpandCollapse"
@@ -137,6 +142,11 @@ export default defineComponent({
   background-color: lightgray;
   padding: 1em;
   border-radius: 0.5em;
+  width: 55%;
+}
+
+.new-snippet-area-editing {
+  width: 100%;
 }
 
 .header-area {

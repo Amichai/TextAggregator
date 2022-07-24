@@ -139,7 +139,6 @@ def generateUUID():
 def getTimeStr():
     return str(datetime.datetime.now())
 
-
 def newNotebook(event, context):
     print("NEW NOTEBOOK")
     print(event)
@@ -247,26 +246,43 @@ def newSnippet(event, context):
     return response
 
 
+def deleteSnippet(event, context):
+    print("Delete snippet")
+    print(event)
+
+    queryStringParameters = event['queryStringParameters']
+    print(queryStringParameters)
+
+    notebookId = queryStringParameters['notebookId']
+    snippetId = queryStringParameters['snippetId']
+    userId = queryStringParameters['userId']
+    userId_snippetId = "{}-{}".format(userId, snippetId)
+    dynamodb = boto3.resource('dynamodb')
+    snippetsTable = dynamodb.Table('TA_Snippets')
+
+    response = snippetsTable.delete_item(
+        Key={
+        'notebookId': notebookId,
+        'userId-snippetId': userId_snippetId
+        }
+    )
+    
+    response = {"statusCode": 200, "body": json.dumps(response)}
+
+    return response
+
+
 if __name__ == "__main__":
 
     notebookId = "5c5dcfe647794baabe7649da394cf5b4"
-    snippetId = "720c84b7d5754a6f80aad38d7432aae6"
+    snippetId = "0ba76097490e48fdb00806faf22bdf6a"
     userId = "amichai"
 
     # queryStringParameters = event['queryStringParameters']
     # notebookId = queryStringParameters['notebookId']
 
-    result = getNotebook({'queryStringParameters': {'notebookId': notebookId}}, {})
-
-    result = json.loads(result['body'])
+    result = deleteSnippet({'queryStringParameters': {'notebookId': notebookId, 'snippetId': snippetId, 'userId': userId}}, {})
     print(result)
-    print(result.keys())
-    result = result['snippets']
-    dates = [a['created'] for a in result]
-    print(dates)
-# handlers for posting a new snippet
-# listing snippets - by project
-# editing a snippet
 
 
 # user authentication

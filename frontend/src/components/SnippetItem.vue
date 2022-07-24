@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="edit-delete-snippet">
-      <a class="link-primary"> Delete </a>
+      <a class="link-primary" @click="deleteClicked">Delete </a>
       <a class="link-primary" @click="editClicked">Edit</a>
     </div>
     <!-- :href="`/${notebookId}/Snippet/${snippet.snippetId}`" -->
@@ -27,6 +27,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { deleteSnippet } from './../helpers/apiHelper';
 
 export default defineComponent({
   components: {},
@@ -44,9 +45,13 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    userId: {
+      type: String,
+      required: true,
+    },
   },
 
-  emits: ['tagClicked', 'editClicked'],
+  emits: ['tagClicked', 'editClicked', 'deleteClicked'],
 
   setup(props, { emit }) {
     const parsedTags = props.snippet.tags.filter((t) => t !== '');
@@ -60,10 +65,21 @@ export default defineComponent({
       emit('editClicked', props.snippet);
     };
 
+    const deleteClicked = async () => {
+      await deleteSnippet(
+        props.notebookId,
+        props.userId,
+        props.snippet.snippetId
+      );
+
+      emit('deleteClicked', props.snippet);
+    };
+
     return {
       tags,
       tagClicked,
       editClicked,
+      deleteClicked,
     };
   },
 });
