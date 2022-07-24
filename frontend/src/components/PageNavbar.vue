@@ -21,6 +21,10 @@
             <use xlink:href="#bootstrap"></use>
           </svg>
         </a>
+
+        <a @click="logout" class="link-primary">
+          Log Out
+        </a>
       </div>
     </div>
   </header>
@@ -28,10 +32,19 @@
 
 <script>
 import { defineComponent } from 'vue';
+import { useAuth0 } from '@auth0/auth0-vue';
+
 
 export default defineComponent({
   setup() {
-    return {};
+    const { loginWithRedirect, logout } = useAuth0();
+
+    return {
+      login: () => {
+       loginWithRedirect();
+      },
+      logout,
+    };
   },
 });
 </script>
@@ -39,5 +52,10 @@ export default defineComponent({
 <style scoped>
 .header {
   background-color: lightgray;
+}
+
+.link-primary {
+  cursor: pointer;
+  margin-left: 3em;
 }
 </style>
