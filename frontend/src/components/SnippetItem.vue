@@ -1,11 +1,11 @@
 <template>
-  <div class="snippet-item">
-    <EditableTitle v-model="snippet.title">
-      <h4>
-        {{snippet.title}}
-      </h4>
-    </EditableTitle>
-
+  <div
+    class="snippet-item"
+    @click="editClicked"
+  >
+    <h4>
+      {{snippet.title}}
+    </h4>
   
     <div
       v-html="snippet.body"
@@ -25,8 +25,9 @@
       </div>
     </div>
     <div class="edit-delete-snippet">
-      <a class="link-primary" @click="deleteClicked">Delete </a>
-      <a class="link-primary" @click="editClicked">Edit</a>
+      <a class="link-primary" @click="deleteClicked">Delete</a>
+      <i class="bi bi-1-square"></i>
+      <!-- <a class="link-primary" @click="editClicked">Edit</a> -->
     </div>
     <!-- :href="`/${notebookId}/Snippet/${snippet.snippetId}`" -->
   </div>
@@ -75,7 +76,8 @@ export default defineComponent({
       emit('editClicked', props.snippet);
     };
 
-    const deleteClicked = async () => {
+    const deleteClicked = async (arg) => {
+      arg.stopPropagation();
       await deleteSnippet(
         props.notebookId,
         props.userId,
