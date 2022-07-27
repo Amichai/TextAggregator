@@ -4,8 +4,8 @@
       'new-snippet-area',
       isEditingExistingSnippet && 'new-snippet-area-editing',
     ]"
+    v-click-outside="cancelChanges"
   >
-    <!-- v-click-outside="cancelChanges" -->
     <div
       class="header-area"
       @click="toggleExpandCollapse"

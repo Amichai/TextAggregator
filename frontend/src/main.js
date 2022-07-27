@@ -3,7 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { guard } from './helpers/guard';
 import { createAuth0 } from '@auth0/auth0-vue';
-import vClickOutside from 'vue-click-outside';
+import vClickOutside from 'click-outside-vue3'
 
 // import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 

@@ -114,3 +114,5 @@ deploy:
 list:
   aws --region us-east-1 --profile vue-deployer s3 ls s3://textaggregator
 
+url:
+d1nbi2o5k1l5mi.cloudfront.net
