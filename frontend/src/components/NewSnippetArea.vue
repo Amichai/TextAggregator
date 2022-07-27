@@ -101,10 +101,12 @@ export default defineComponent({
     const userId = user.value.sub
 
     const cancelChanges = () => {
+      isCollapsed.value = true
       emit('cancelChanges', props.snippet);
     };
 
     const submitSnippet = async () => {
+      isCollapsed.value = true
       const snippetId =
         props.snippet?.snippetId ?? uuidv4().replaceAll('-', '');
       newSnippet(

@@ -22,6 +22,7 @@
       <NewSnippetArea
         :notebookId="notebookId"
         @snippetSubmitted="snippetSubmitted"
+        @cancelChanges="cancelNewSnippet"
       />
       <ul id="snippet-list">
         <li
@@ -150,6 +151,7 @@ export default defineComponent({
       if (tags.value.length === 0) {
         snippetsFiltered.value = snippets.value;
         router.push({ path, query: {} });
+        filterTags.value = []
         return;
       }
 
@@ -206,6 +208,10 @@ export default defineComponent({
     const cancelChanges = () => {
       editingSnippet.value = undefined;
     };
+    
+    const cancelNewSnippet = () => {
+      
+    }
 
     return {
       snippets,
@@ -224,6 +230,7 @@ export default defineComponent({
       cancelChanges,
       loadNotebook,
       userId,
+      cancelNewSnippet,
     };
   },
 });

@@ -142,10 +142,6 @@ export default defineComponent({
   padding: 0 18% 0 18%;
 }
 
-.link-primary {
-  cursor: pointer;
-}
-
 .vue-tags-input {
   margin: 0.5em;
 }

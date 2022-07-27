@@ -55,8 +55,4 @@ export default defineComponent({
   background-color: lightgray;
 }
 
-.link-primary {
-  cursor: pointer;
-  margin-left: 3em;
-}
 </style>

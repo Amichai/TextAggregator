@@ -9,3 +9,8 @@ TODO:
 
 - from the homepage I want books and pages
 - Make it easy to deeply link snippets wiki-style
+
+
+ 
+ - stuck filter tag color
+ - pressing enter in the title of a post in edit mode should submit the change
