@@ -18,18 +18,15 @@
           v-for="tag in tags"
           :key="tag"
           :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
-          @click="tagClicked(tag)"
+          @click="(evt) => tagClicked(evt, tag)"
         >
           {{ tag }}
         </p>
       </div>
+      <div>
+        <a class="link-primary"><i class="bi-trash" @click="deleteClicked"></i></a>
+      </div>
     </div>
-    <div class="edit-delete-snippet">
-      <a class="link-primary" @click="deleteClicked">Delete</a>
-      <i class="bi bi-1-square"></i>
-      <!-- <a class="link-primary" @click="editClicked">Edit</a> -->
-    </div>
-    <!-- :href="`/${notebookId}/Snippet/${snippet.snippetId}`" -->
   </div>
 </template>
 
@@ -37,6 +34,7 @@
 import { defineComponent, ref } from 'vue';
 import { deleteSnippet } from './../helpers/apiHelper';
 import EditableTitle from './EditableTitle.vue';
+
 
 export default defineComponent({
   components: {
@@ -68,7 +66,8 @@ export default defineComponent({
     const parsedTags = props.snippet.tags.filter((t) => t !== '');
     const tags = ref(parsedTags);
 
-    const tagClicked = (tagText) => {
+    const tagClicked = (evt, tagText) => {
+      evt.stopPropagation();
       emit('tagClicked', tagText);
     };
 
@@ -114,6 +113,7 @@ export default defineComponent({
 .tags-container {
   display: flex;
   flex-wrap: wrap;
+  flex: 1;
 }
 .tag-p {
   background: #5c6bc0;
@@ -128,11 +128,6 @@ export default defineComponent({
 
 .filter-tag {
   background: rgb(208, 86, 72);
-}
-
-.edit-delete-snippet {
-  display: flex;
-  flex-direction: row-reverse;
 }
 
 a {

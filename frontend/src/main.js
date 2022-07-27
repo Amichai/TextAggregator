@@ -10,9 +10,7 @@ import { createAuth0 } from '@auth0/auth0-vue';
 // import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import 'bootstrap/dist/css/bootstrap.css';
-
 import 'bootstrap/dist/js/bootstrap';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const app = createApp(App);
 // Make sure to _use_ the router instance to make the

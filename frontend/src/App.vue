@@ -10,4 +10,6 @@ import { RouterLink, RouterView } from 'vue-router';
 
 <style>
 @import "main.css";
+@import url('bootstrap-icons/font/bootstrap-icons.css');
+
 </style>
