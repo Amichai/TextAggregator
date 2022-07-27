@@ -8,3 +8,4 @@ TODO:
   - Toggle top-level filter tag not working
 
 - from the homepage I want books and pages
+- Make it easy to deeply link snippets wiki-style

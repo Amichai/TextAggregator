@@ -1,9 +1,16 @@
 <template>
   <div class="snippet-item">
-    <h4 v-if="snippet.title">
-      {{ snippet.title }}
-    </h4>
-    <div v-html="snippet.body" />
+    <EditableTitle v-model="snippet.title">
+      <h4>
+        {{snippet.title}}
+      </h4>
+    </EditableTitle>
+
+  
+    <div
+      v-html="snippet.body"
+      class="snippet-body"
+    />
 
     <div class="footer">
       <div class="tags-container" v-if="tags != undefined">
@@ -28,9 +35,12 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { deleteSnippet } from './../helpers/apiHelper';
+import EditableTitle from './EditableTitle.vue';
 
 export default defineComponent({
-  components: {},
+  components: {
+    EditableTitle,
+  },
 
   props: {
     snippet: {
@@ -125,5 +135,9 @@ export default defineComponent({
 
 a {
   margin-right: 1em;
+}
+
+.snippet-body {
+  white-space: pre;
 }
 </style>

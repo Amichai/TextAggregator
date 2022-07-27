@@ -2,7 +2,11 @@
   <div>
     <PageNavbar />
     <div class="notebook-board">
-      <EditableTitle v-model="notebookName" @blur="nameUpdated" />
+      <EditableTitle v-model="notebookName" @blur="nameUpdated">
+        <h2>
+          {{notebookName}}
+        </h2>
+      </EditableTitle>
       <div class="snippet-filters">
         <div class="tags-container" v-if="allTags != undefined">
           <p
@@ -29,7 +33,7 @@
             v-if="snippet.snippetId !== editingSnippet?.snippetId"
             :snippet="snippet"
             :notebookId="notebookId"
-            userId="amichai"
+            :userId="userId"
             :filterTags="tags"
             @tagClicked="tagClicked"
             @editClicked="(s) => (editingSnippet = s)"
@@ -68,6 +72,7 @@ import EditableTitle from './EditableTitle.vue';
 import SnippetItem from './SnippetItem.vue';
 import NewSnippetArea from './NewSnippetArea.vue';
 import { getNotebook, updateNotebook } from './../helpers/apiHelper';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
   components: {
@@ -90,13 +95,22 @@ export default defineComponent({
     const notebookName = ref(' ');
     const allTags = ref([]);
     const editingSnippet = ref(null);
+    
+    const { user } = useAuth0();
+    const userId = user.value.sub
 
     const loadNotebook = () => {
       getNotebook(props.notebookId).then((json) => {
         notebookName.value = json.notebook.name;
         snippets.value = json.snippets;
-        snippets.value.map(
-          (snippet) => (snippet.tags = snippet.tags.split(','))
+        snippets.value.forEach(
+          (snippet) => {
+            if(!snippet.tags) {
+              snippet.tags = [];
+              return 
+            }
+            snippet.tags = snippet.tags.split(',');
+          }
         );
 
         const allTagsWithDuplicates = snippets.value.reduce(
@@ -209,6 +223,7 @@ export default defineComponent({
       editingSnippet,
       cancelChanges,
       loadNotebook,
+      userId,
     };
   },
 });

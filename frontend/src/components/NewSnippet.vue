@@ -7,7 +7,11 @@
         notebookName
       }}</a>
       <div>
-        <EditableTitle v-model="title" />
+        <EditableTitle v-model="title">
+          <h3>
+            {{title}}
+          </h3>
+        </EditableTitle>
       </div>
       <Editor
         api-key="87di36sy23q93vwyyaopux8zr5pi3l3zqim8wr2029pg314f"
@@ -54,6 +58,7 @@ import {
   newSnippet,
   getSnippet,
 } from './../helpers/apiHelper';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
   components: {
@@ -81,6 +86,9 @@ export default defineComponent({
     console.log(`snippet id: ${props.snippetId}`);
     const notebookName = ref('');
 
+    const { user } = useAuth0();
+    const userId = user.value.sub
+
     getNotebookInfo(props.notebookId).then((json) => {
       notebookName.value = json.name;
       console.log(json);
@@ -93,7 +101,7 @@ export default defineComponent({
     const router = useRouter();
 
     const title = ref('');
-    getSnippet(props.notebookId, props.snippetId, 'amichai').then((json) => {
+    getSnippet(props.notebookId, props.snippetId, userId).then((json) => {
       title.value = json.name;
       body.value = json.body;
       tags.value = json.tags.split(',').map((tagText) => ({
@@ -108,7 +116,7 @@ export default defineComponent({
         body.value,
         tags.value.map((tag) => tag.text).join(),
         props.notebookId,
-        'amichai',
+        userId,
         props.snippetId
       ).then((text) => {
         console.log('Success', text);

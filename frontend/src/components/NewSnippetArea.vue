@@ -58,6 +58,7 @@ import { defineComponent, ref } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import { newSnippet } from './../helpers/apiHelper';
 import { v4 as uuidv4 } from 'uuid';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
   components: {
@@ -96,6 +97,9 @@ export default defineComponent({
       isCollapsed.value = !isCollapsed.value;
     };
 
+    const { user } = useAuth0();
+    const userId = user.value.sub
+
     const cancelChanges = () => {
       emit('cancelChanges', props.snippet);
     };
@@ -108,7 +112,7 @@ export default defineComponent({
         body.value,
         tags.value.map((tag) => tag.text).join(),
         props.notebookId,
-        'amichai',
+        userId,
         snippetId
       ).then((text) => {
         console.log('Success', text);

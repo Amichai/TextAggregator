@@ -1,12 +1,17 @@
 <template>
   <div class="notebook-name">
-    <h2
+    <!-- <h2
       v-if="!isEditingTitle"
       class="notebook-name-header"
       @click="isEditingTitle = true"
     >
       {{ modelValueModified }}
-    </h2>
+    </h2> -->
+    <div v-if="!isEditingTitle"
+      class="notebook-name-header"
+      @click="isEditingTitle = true">
+      <slot />
+    </div>
     <div class="edit-title-wrapper" v-if="isEditingTitle">
       <input
         class="edit-title-input form-control"

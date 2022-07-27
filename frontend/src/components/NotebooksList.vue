@@ -19,6 +19,7 @@ import PageNavbar from './PageNavbar.vue';
 import { getNotebooks, newNotebook } from './../helpers/apiHelper';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
+import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
   components: {
@@ -31,8 +32,8 @@ export default defineComponent({
   emits: [],
 
   setup(props, { emit }) {
-    // query the database for a list of notebooks, ids and names - visiblity
-    const userId = 'amichai';
+    const { user } = useAuth0();
+    const userId = user.value.sub
 
     const router = useRouter();
 

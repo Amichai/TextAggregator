@@ -32,6 +32,9 @@ def getNotebooks(event, context):
     response = table.query(KeyConditionExpression=Key('userId').eq(userId))
     items = response['Items']
     print(items)
+    if len(items) < 1:
+        return {"statusCode": 200, "body": json.dumps([])}
+
     item = items[0]
 
     ids = item['notebookIds'].split(',')
@@ -40,6 +43,9 @@ def getNotebooks(event, context):
 
     to_return = []
     for id in ids:
+        if id == '':
+            continue
+
         response = table.query(KeyConditionExpression=Key('notebookId').eq(id))
         item = response['Items'][0]
         to_return.append({
@@ -66,18 +72,23 @@ def getNotebook(event, context):
     response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
     items = response['Items']
 
-    items = sorted(items, key=lambda a: a['created'], reverse=True)
+    snippets = sorted(items, key=lambda a: a['created'], reverse=True)
 
     notebooksTable = dynamodb.Table('TA_Notebooks')
     response = notebooksTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
-    notebook = response['Items'][0]
 
+    items = response['Items']
+
+    if len(items) < 1:
+        return {"statusCode": 200, "body": {"message": "notebook not found"}}
+
+    notebook = items[0]
 
     response = {
         "statusCode": 200,
         "body": json.dumps({
             'notebook': notebook,
-            'snippets': items,
+            'snippets': snippets,
             })
     }
 
@@ -102,7 +113,12 @@ def getSnippet(event, context):
     & Key('userId-snippetId').eq(userId_snippetId)
     )
 
-    item = response['Items'][0]
+    items = response['Items']
+
+    if len(items) < 1:
+        return {"statusCode": 200, "body": {"message": "snippet not found"}}
+
+    item = items[0]
 
     response = {
         "statusCode": 200,
@@ -124,7 +140,13 @@ def getNotebookInfo(event, context):
 
     notebooksTable = dynamodb.Table('TA_Notebooks')
     response = notebooksTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
-    notebook = response['Items'][0]
+
+    items = response['Items']
+
+    if len(items) < 1:
+        return {"statusCode": 200, "body": "notebook not found"}
+
+    notebook = items[0]
 
     response = {
         "statusCode": 200,
@@ -162,26 +184,42 @@ def newNotebook(event, context):
     
     to_write = json.loads(json.dumps(to_write), parse_float=Decimal)
 
+    print("to write: {}".format(to_write))
+
     result = table.put_item(
         Item=to_write
     )
+
+    print("wrote notebook")
 
     response = {"statusCode": 200, "body": json.dumps(result)}
 
     users_table = dynamodb.Table('TA_Users')
     response = users_table.query(KeyConditionExpression=Key('userId').eq(userId))
-    matchedUser = response['Items'][0]
+
+    items = response['Items']
+
+    if len(items) < 1:
+        print("user not found")
+        return {"statusCode": 200, "body": {"message": "user not found"}}
+
+    matchedUser = items[0]
     notebookIds = matchedUser['notebookIds']
+
+    print("notebook ids: {}".format(notebookIds))
 
     notebookIds += ",{}".format(notebookId)
 
-    users_table.update_item(
+    update_result = users_table.update_item(
         Key={'userId': userId},
         UpdateExpression="set notebookIds = :i",
          ExpressionAttributeValues={
         ':i': notebookIds,
     },
     )
+
+    print("update item result: {}".format(update_result))
+
 
     return response
 

@@ -100,7 +100,17 @@ serverless plugin install -n serverless-python-requirements
 
 Running the above will automatically add `serverless-python-requirements` to `plugins` section in your `serverless.yml` file and add it as a `devDependency` to `package.json` file. The `package.json` file will be automatically created if it doesn't exist beforehand. Now you will be able to add your dependencies to `requirements.txt` file (`Pipfile` and `pyproject.toml` is also supported but requires additional configuration) and they will be automatically injected to Lambda package during build process. For more details about the plugin's configuration, please refer to [official documentation](https://github.com/UnitedIncome/serverless-python-requirements).
 
+
 ---
+
+npm run dev
+npm run build
 
 python3 -m virtualenv env; source env/bin/activate
 source env/bin/activate
+
+deploy:
+  aws --region us-east-1 --profile vue-deployer s3 sync ./dist s3://textaggregator --delete
+list:
+  aws --region us-east-1 --profile vue-deployer s3 ls s3://textaggregator
+
