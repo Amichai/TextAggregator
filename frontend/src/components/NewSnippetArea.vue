@@ -61,6 +61,7 @@ import { newSnippet } from './../helpers/apiHelper';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth0 } from '@auth0/auth0-vue';
 
+
 export default defineComponent({
   components: {
     VueTagsInput,

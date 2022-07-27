@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import { guard } from './helpers/guard';
 import { createAuth0 } from '@auth0/auth0-vue';
+import vClickOutside from 'vue-click-outside';
 
 // import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
@@ -16,6 +17,7 @@ const app = createApp(App);
 // Make sure to _use_ the router instance to make the
 // whole app router-aware.
 app.use(router);
+app.use(vClickOutside);
 
 app.use(
   createAuth0({
@@ -25,7 +27,7 @@ app.use(
   })
 );
 
-
+  
 app.mount('#app');
 
 app.directive('focus', {
@@ -33,3 +35,4 @@ app.directive('focus', {
     guard(binding.value === false) || element.focus();
   },
 });
+  
