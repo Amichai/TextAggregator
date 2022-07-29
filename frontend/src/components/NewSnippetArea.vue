@@ -4,7 +4,7 @@
       'new-snippet-area',
       isEditingExistingSnippet && 'new-snippet-area-editing',
     ]"
-    v-click-outside="cancelChanges"
+    v-click-outside="submitSnippet"
   >
     <div
       class="header-area"
@@ -19,6 +19,7 @@
     </div>
     <div v-if="!isCollapsed">
       <input
+        @keydown.enter="submitSnippet"
         class="form-control"
         type="text"
         placeholder="Title"
@@ -36,20 +37,6 @@
         :tags="tags"
         @tags-changed="(newTags) => (tags = newTags)"
       />
-      <button
-        type="button"
-        class="btn btn-primary submit-button"
-        @click="submitSnippet"
-      >
-        {{ isEditingExistingSnippet ? 'Save' : 'Post' }}
-      </button>
-      <button
-        type="button"
-        class="btn btn-primary submit-button cancel-button"
-        @click="cancelChanges"
-      >
-        Cancel
-      </button>
     </div>
   </div>
 </template>
@@ -108,9 +95,15 @@ export default defineComponent({
     };
 
     const submitSnippet = async () => {
+      if(isCollapsed.value) {
+        return
+      }
+
       isCollapsed.value = true
       const snippetId =
         props.snippet?.snippetId ?? uuidv4().replaceAll('-', '');
+
+
       newSnippet(
         title.value ?? '',
         body.value,
