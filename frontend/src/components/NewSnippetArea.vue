@@ -42,11 +42,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch, watchEffect } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import { newSnippet } from './../helpers/apiHelper';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth0 } from '@auth0/auth0-vue';
+import { useMagicKeys } from '@vueuse/core'
 
 
 export default defineComponent({
@@ -74,6 +75,18 @@ export default defineComponent({
   emits: ['snippetSubmitted', 'cancelChanges'],
 
   setup(props, { emit }) {
+
+    const { shift, space, a, meta, enter } = useMagicKeys()
+    watch(space, (v) => {
+      if (v)
+        console.log('space has been pressed')
+    })
+
+    watchEffect(() => {
+      if (meta.value && enter.value && !isCollapsed.value)
+        submitSnippet()
+    })
+
     const isCollapsed = ref(!props.isEditingExistingSnippet);
     const body = ref(props.snippet?.body ?? '');
     const tag = ref('');
@@ -98,8 +111,13 @@ export default defineComponent({
       if(isCollapsed.value) {
         return
       }
-
+      
       isCollapsed.value = true
+
+      if(!body.value && !title.value) {
+        return
+      }
+
       const snippetId =
         props.snippet?.snippetId ?? uuidv4().replaceAll('-', '');
 
@@ -141,7 +159,7 @@ export default defineComponent({
 <style scoped>
 .new-snippet-area {
   background-color: lightgray;
-  padding: 1em;
+  padding: 0.5em;
   border-radius: 0.5em;
   /* width: 55%; */
 }
@@ -159,15 +177,9 @@ export default defineComponent({
 .text-area {
   height: 10em;
   min-height: 10em;
-  margin-top: 0.6em;
 }
 
 .vue-tags-input {
-  margin: 0.5em;
   width: 100%;
-}
-
-.cancel-button {
-  margin-left: 1em;
 }
 </style>

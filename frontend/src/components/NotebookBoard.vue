@@ -279,6 +279,7 @@ export default defineComponent({
 
 .board-header {
   margin: 0 18% 0 18%;
+  /* width: 50em; */
 }
 
 .snippet-filters {
