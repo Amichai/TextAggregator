@@ -114,5 +114,8 @@ deploy:
 list:
   aws --region us-east-1 --profile vue-deployer s3 ls s3://textaggregator
 
+Invalidate cloudfront cache:
+aws --region us-east-1 --profile vue-deployer cloudfront create-invalidation --distribution-id EZM1KZKDZ6V2A --paths '/*'
+
 url:
 d1nbi2o5k1l5mi.cloudfront.net

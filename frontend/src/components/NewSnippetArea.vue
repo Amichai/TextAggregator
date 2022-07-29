@@ -150,7 +150,7 @@ export default defineComponent({
   background-color: lightgray;
   padding: 1em;
   border-radius: 0.5em;
-  width: 55%;
+  /* width: 55%; */
 }
 
 .new-snippet-area-editing {

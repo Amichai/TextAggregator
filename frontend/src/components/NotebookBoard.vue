@@ -1,29 +1,59 @@
 <template>
   <div>
     <PageNavbar />
-    <div class="notebook-board">
-      <EditableTitle v-model="notebookName" @blur="nameUpdated">
-        <h2>
-          {{notebookName}}
-        </h2>
-      </EditableTitle>
-      <div class="snippet-filters">
-        <div class="tags-container" v-if="allTags != undefined">
-          <p
-            v-for="tag in allTags"
-            :key="tag"
-            @click="tagClicked(tag)"
-            :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
-          >
-            {{ tag }}
-          </p>
-        </div>
+
+    <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <NewSnippetArea
-        :notebookId="notebookId"
-        @snippetSubmitted="snippetSubmitted"
-        @cancelChanges="cancelNewSnippet"
-      />
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Button trigger modal -->
+
+
+
+    <div class="notebook-board">
+      <div class="board-header">
+        <EditableTitle v-model="notebookName" @blur="nameUpdated">
+          <h2>
+            {{notebookName}}
+          </h2>
+        </EditableTitle>
+        <div class="snippet-filters">
+          <div class="tags-container" v-if="allTags != undefined">
+            <p
+              v-for="tag in allTags"
+              :key="tag"
+              @click="tagClicked(tag)"
+              :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
+            >
+              {{ tag }}
+            </p>
+          </div>
+        </div>
+        <NewSnippetArea
+          :notebookId="notebookId"
+          @snippetSubmitted="snippetSubmitted"
+          @cancelChanges="cancelNewSnippet"
+        />
+      </div>
       <ul id="snippet-list">
         <li
           v-for="snippet in snippetsFiltered"
@@ -241,6 +271,14 @@ export default defineComponent({
   list-style: none;
   margin: 0;
   padding: 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.board-header {
+  margin: 0 18% 0 18%;
 }
 
 .snippet-filters {
@@ -254,11 +292,11 @@ export default defineComponent({
 }
 
 .snippet-item {
-  margin-top: 0.7em;
+  margin: 0.7em;
 }
 
 .notebook-board {
-  padding: 0 18% 0 18%;
+  padding: 0 4em 0 4em;
   padding-bottom: 4em;
 }
 

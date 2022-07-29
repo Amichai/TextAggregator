@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build; aws --region us-east-1 --profile vue-deployer s3 sync ./dist s3://textaggregator --delete; aws --region us-east-1 --profile vue-deployer cloudfront create-invalidation --distribution-id EZM1KZKDZ6V2A --paths '/*'"
   },
   "dependencies": {
     "@auth0/auth0-vue": "^1.0.2",

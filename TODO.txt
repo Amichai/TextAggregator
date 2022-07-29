@@ -1,16 +1,17 @@
 TODO:
 
- * - Sort all filter tags alphabetically
- * - Delete functionality 
+ 
  - Editng tags on  snippet doesn't update until refresh
  - Sort by createdAt, not modified date! 
-  - User table, auth0 integration
-  - Toggle top-level filter tag not working
 
 - from the homepage I want books and pages
 - Make it easy to deeply link snippets wiki-style
 
 
- 
- - stuck filter tag color
+
+
+  
+  - drag notebooks around
+   - add a snippet instead of a notebook on the home page
+    - condensed/scrollable snippet view
  - pressing enter in the title of a post in edit mode should submit the change
