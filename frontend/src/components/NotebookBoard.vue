@@ -52,6 +52,7 @@ import SnippetItem from './SnippetItem.vue';
 import NewSnippetArea from './NewSnippetArea.vue';
 import { getNotebook, updateNotebook } from './../helpers/apiHelper';
 import { useAuth0 } from '@auth0/auth0-vue';
+import { removeElement } from "../helpers/helpers";
 
 export default defineComponent({
   components: {
@@ -183,7 +184,7 @@ export default defineComponent({
       set: (newTags) => (tags.value = newTags.map((tag) => tag.text)),
     });
 
-    watch(tags, (newVal, oldVal) => {
+    watch(() => tags, (newVal, oldVal) => {
       filterItems();
     });
 
@@ -200,17 +201,6 @@ export default defineComponent({
 
     const selectedSnippets = ref([])
     const selectedSnippetIndices = ref([])
-
-    const removeElement = (arr, element) => {
-      for(var i = 0; i < arr.length; i++) {
-        if(arr[i] === element) {
-          arr.splice(i, 1)
-          break
-        }
-      }
-
-      return arr
-    }
 
     const selectSummary = (index) => {
       if(selectedSnippetIndices.value.includes(index)) {

@@ -17,6 +17,7 @@ import { defineComponent, computed, watch, onMounted, onUnmounted, ref, PropType
 import BoardViewMobile from './BoardViewMobile.vue'
 import BoardViewDesktop from './BoardViewDesktop.vue'
 import PageNavbar from './PageNavbar.vue';
+import { removeElement } from "./../helpers/helpers";
 
 export default defineComponent({
   components: {
@@ -44,17 +45,6 @@ export default defineComponent({
 
     const selectedSnippets = ref([])
     const selectedSnippetIndices = ref([])
-
-    const removeElement = (arr, element) => {
-      for(var i = 0; i < arr.length; i++) {
-        if(arr[i] === element) {
-          arr.splice(i, 1)
-          break
-        }
-      }
-
-      return arr
-    }
 
     const selectSummary = (index) => {
       if(selectedSnippetIndices.value.includes(index)) {
