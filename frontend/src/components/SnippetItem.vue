@@ -104,7 +104,6 @@ export default defineComponent({
   border-color: black;
   border-style: solid;
   border-width: 0.08em;
-  width: 20em;
   /* height: 20em; */
 }
 

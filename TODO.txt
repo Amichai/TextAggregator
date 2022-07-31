@@ -1,17 +1,16 @@
 TODO:
 
  
- - Editng tags on  snippet doesn't update until refresh
- - Sort by createdAt, not modified date! 
+- collapsable side bar
+- edit tags on a post
+- tag filtering
+- new snippet
+- search bar
 
-- from the homepage I want books and pages
-- Make it easy to deeply link snippets wiki-style
+- sorted tags
+- tags should be all lower case always.
+-------
 
-
-
-
-  
-  - drag notebooks around
-   - add a snippet instead of a notebook on the home page
-    - condensed/scrollable snippet view
- - pressing enter in the title of a post in edit mode should submit the change
+Mobile -> condensed view. Clicking on a header opens up edit mode
+Thin desktop -> two columns. condensed view, and all the edit cards
+Desktop -> three columns condensed, cards, tags

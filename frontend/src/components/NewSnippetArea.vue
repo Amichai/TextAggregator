@@ -2,33 +2,25 @@
   <div
     :class="[
       'new-snippet-area',
-      isEditingExistingSnippet && 'new-snippet-area-editing',
+      'new-snippet-area-editing',
     ]"
-    v-click-outside="submitSnippet"
   >
-    <div
-      class="header-area"
-      @click="toggleExpandCollapse"
-      v-if="!isEditingExistingSnippet"
-    >
-      <h4>New Post</h4>
-      <div>
-        <i class="bi bi-arrows-collapse" v-if="!isCollapsed"></i>
-        <i class="bi bi-arrows-expand" v-if="isCollapsed"></i>
-      </div>
-    </div>
-    <div v-if="!isCollapsed">
+    <div>
       <input
         @keydown.enter="submitSnippet"
         class="form-control"
         type="text"
         placeholder="Title"
         v-model="title"
+        @blur="saveSnippet"
       />
       <textarea
+        ref="textAreaRef"
         class="form-control text-area"
         placeholder="New post here!"
         v-model="body"
+        @input="textAreaChange"
+        @blur="submitSnippet"
       ></textarea>
       <VueTagsInput
         class="vue-tags-input"
@@ -36,13 +28,30 @@
         v-model="tag"
         :tags="tags"
         @tags-changed="(newTags) => (tags = newTags)"
+        @blur="submitSnippet"
       />
+
+      <div class="footer">
+        <div class="tags-container" v-if="parsedTags != undefined">
+          <p
+            v-for="tag in parsedTags"
+            :key="tag"
+            :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
+            @click="(evt) => tagClicked(evt, tag)"
+          >
+            {{ tag }}
+          </p>
+        </div>
+        <div>
+          <a class="link-primary"><i class="bi-trash" @click="deleteClicked"></i></a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, watchEffect } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch, watchEffect } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import { newSnippet } from './../helpers/apiHelper';
 import { v4 as uuidv4 } from 'uuid';
@@ -60,60 +69,44 @@ export default defineComponent({
       type: String,
       default: '',
     },
-
-    isEditingExistingSnippet: {
-      type: Boolean,
-      default: false,
-    },
-
     snippet: {
       type: Object,
       required: false,
     },
+    filterTags: {
+      type: Array,
+      required: true,
+    },
   },
 
-  emits: ['snippetSubmitted', 'cancelChanges'],
+  emits: ['tagClicked', 'snippetSubmitted', 'cancelChanges'],
 
   setup(props, { emit }) {
-
-    const { shift, space, a, meta, enter } = useMagicKeys()
-    watch(space, (v) => {
-      if (v)
-        console.log('space has been pressed')
-    })
+    const { meta, enter } = useMagicKeys()
 
     watchEffect(() => {
-      if (meta.value && enter.value && !isCollapsed.value)
+      if (meta.value && enter.value)
         submitSnippet()
     })
 
-    const isCollapsed = ref(!props.isEditingExistingSnippet);
-    const body = ref(props.snippet?.body ?? '');
+    const body = ref(props.snippet?.body ?? '')
+
+    
     const tag = ref('');
     const tags = ref(
       (props.snippet?.tags ?? []).filter((i) => i).map((i) => ({ text: i }))
     );
-    const title = ref(props.snippet?.title ?? '');
 
-    const toggleExpandCollapse = () => {
-      isCollapsed.value = !isCollapsed.value;
-    };
+    const title = ref(props.snippet?.title ?? '');
 
     const { user } = useAuth0();
     const userId = user.value.sub
 
     const cancelChanges = () => {
-      isCollapsed.value = true
       emit('cancelChanges', props.snippet);
     };
 
     const submitSnippet = async () => {
-      if(isCollapsed.value) {
-        return
-      }
-      
-      isCollapsed.value = true
-
       if(!body.value && !title.value) {
         return
       }
@@ -133,24 +126,40 @@ export default defineComponent({
         console.log('Success', text);
 
         emit('snippetSubmitted');
-
-        body.value = '';
-        tag.value = '';
-        tags.value = [];
-        title.value = '';
       });
     };
 
+    const textAreaRef = ref(null)
+
+    onMounted(() => {
+      textAreaRef.value.style.height = "";
+      textAreaRef.value.style.height = textAreaRef.value.scrollHeight + "px"
+    })
+
+    const textAreaChange = () => {
+      textAreaRef.value.style.height = "";
+      textAreaRef.value.style.height = textAreaRef.value.scrollHeight + "px"
+    }
+
+    const tagClicked = (evt, tagText) => {
+      evt.stopPropagation();
+      emit('tagClicked', tagText);
+    };
+
+    const parsedTags = ref(props.snippet.tags.filter((t) => t !== ''));
+
     return {
-      isCollapsed,
       body,
       tag,
       tags,
       title,
       submitSnippet,
-      toggleExpandCollapse,
 
       cancelChanges,
+      textAreaRef,
+      textAreaChange,
+      tagClicked,
+      parsedTags,
     };
   },
 });
@@ -161,6 +170,7 @@ export default defineComponent({
   background-color: lightgray;
   padding: 0.5em;
   border-radius: 0.5em;
+  margin-bottom: 1em;
   /* width: 55%; */
 }
 
@@ -175,11 +185,39 @@ export default defineComponent({
 }
 
 .text-area {
-  height: 10em;
+  /* height: 10em; */
   min-height: 10em;
 }
 
 .vue-tags-input {
   width: 100%;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+}
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.tag-p {
+  background: #5c6bc0;
+  color: white;
+  margin: 5px;
+  padding: 2.5px 10px 2.5px 10px;
+  border-radius: 3px;
+  font-size: 0.7em;
+  height: fit-content;
+  cursor: pointer;
+}
+
+.filter-tag {
+  background: rgb(208, 86, 72);
+}
+
+a {
+  margin-right: 1em;
 }
 </style>

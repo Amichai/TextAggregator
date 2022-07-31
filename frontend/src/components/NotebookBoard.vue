@@ -2,41 +2,31 @@
   <div>
     <PageNavbar />
 
-    <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Button trigger modal -->
-
-
-
     <div class="notebook-board">
-      <div class="board-header">
-        <EditableTitle v-model="notebookName" @blur="nameUpdated">
-          <h2>
-            {{notebookName}}
-          </h2>
-        </EditableTitle>
-        <div class="snippet-filters">
+      <div class="column-left column">
+        <div v-for="(summary, index) in snippetSummaries" v-bind:key="index"
+          :class="[
+          'snippet-summary', 
+          selectedSnippetIndices.includes(index) && 'selected-snippet-summary'
+          ]"
+          v-html="summary"
+          @click="selectSummary(index)"
+          >
+        </div>
+      </div>
+      <div class="column-center column">
+        <div v-for="snippet in visibleSnippets" :key="snippet.snippetId">
+          <NewSnippetArea 
+            :notebookId="notebookId"
+            :snippet="snippet"
+            :filterTags="filterTags"
+          />
+        </div>
+        <!-- filtered, editable snippets
+        add new snippet form -->
+      </div>
+      <div class="column-right column">
+        <!-- SEARCH BAR -->
           <div class="tags-container" v-if="allTags != undefined">
             <p
               v-for="tag in allTags"
@@ -47,48 +37,6 @@
               {{ tag }}
             </p>
           </div>
-        </div>
-        <NewSnippetArea
-          :notebookId="notebookId"
-          @snippetSubmitted="snippetSubmitted"
-          @cancelChanges="cancelNewSnippet"
-        />
-      </div>
-      <ul id="snippet-list">
-        <li
-          v-for="snippet in snippetsFiltered"
-          :key="snippet['userId-snippetId']"
-          class="snippet-item"
-        >
-          <SnippetItem
-            v-if="snippet.snippetId !== editingSnippet?.snippetId"
-            :snippet="snippet"
-            :notebookId="notebookId"
-            :userId="userId"
-            :filterTags="tags"
-            @tagClicked="tagClicked"
-            @editClicked="(s) => (editingSnippet = s)"
-            @deleteClicked="loadNotebook"
-          />
-          <NewSnippetArea
-            v-if="snippet.snippetId === editingSnippet?.snippetId"
-            :notebookId="notebookId"
-            @snippetSubmitted="snippetSubmitted"
-            @cancelChanges="cancelChanges"
-            :isEditingExistingSnippet="true"
-            :snippet="snippet"
-          />
-        </li>
-      </ul>
-      <div v-if="snippetsFiltered.length === 0 && snippets.length > 0">
-        <br />
-        <br />
-        <i>No results match selected tag filters</i>
-      </div>
-      <div v-if="snippets.length === 0">
-        <br />
-        <br />
-        <i>No Snippets to show</i>
       </div>
     </div>
   </div>
@@ -126,6 +74,8 @@ export default defineComponent({
     const notebookName = ref(' ');
     const allTags = ref([]);
     const editingSnippet = ref(null);
+
+    const snippetSummaries = ref([])
     
     const { user } = useAuth0();
     const userId = user.value.sub
@@ -143,6 +93,14 @@ export default defineComponent({
             snippet.tags = snippet.tags.split(',');
           }
         );
+
+        snippetSummaries.value = snippets.value.map(i => {
+          const title = i.title.trim()
+          const body = i.body.trim()
+
+
+          return `<b>${title}</b> ${body}`
+        })
 
         const allTagsWithDuplicates = snippets.value.reduce(
           (previous, current) => {
@@ -240,8 +198,36 @@ export default defineComponent({
     };
     
     const cancelNewSnippet = () => {
-      
     }
+
+    const selectedSnippets = ref([])
+    const selectedSnippetIndices = ref([])
+
+    const removeElement = (arr, element) => {
+      for(var i = 0; i < arr.length; i++) {
+        if(arr[i] === element) {
+          arr.splice(i, 1)
+          break
+        }
+      }
+
+      return arr
+    }
+
+    const selectSummary = (index) => {
+      if(selectedSnippetIndices.value.includes(index)) {
+        selectedSnippetIndices.value = removeElement(selectedSnippetIndices.value, index)
+        selectedSnippets.value = removeElement(selectedSnippets.value, snippets.value[index])
+      } else {
+        selectedSnippetIndices.value.push(index)
+        selectedSnippets.value.push(snippets.value[index])
+      }
+
+      console.log(selectedSnippets.value)
+    }
+
+    const visibleSnippets = computed(() => selectedSnippets.value.length === 0 ? snippets.value : selectedSnippets.value)
+
 
     return {
       snippets,
@@ -261,53 +247,51 @@ export default defineComponent({
       loadNotebook,
       userId,
       cancelNewSnippet,
+      snippetSummaries,
+      selectSummary,
+      selectedSnippetIndices,
+      visibleSnippets,
     };
   },
 });
 </script>
 
 <style scoped>
-#snippet-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.board-header {
-  margin: 0 18% 0 18%;
-  /* width: 50em; */
-}
-
-.snippet-filters {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1em;
-}
-
-.vue-tags-input {
-  flex: 1;
-}
-
-.snippet-item {
-  margin: 0.7em;
-}
-
 .notebook-board {
-  padding: 0 4em 0 4em;
-  padding-bottom: 4em;
-}
-
-.notebook-menu {
   display: flex;
 }
 
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
+.column {
+  margin: 0.5em;
+}
+
+
+.column-left {
+  flex:1;
+  width: 30%;
+}
+
+.column-center {
+  flex:2.5;
+}
+
+.column-right {
+  flex:1;
+}
+
+.snippet-summary {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.snippet-summary:hover {
+  background-color: lightgray;
+}
+
+.selected-snippet-summary {
+  background-color: gray;
 }
 
 .tag-p {
@@ -324,4 +308,5 @@ export default defineComponent({
 .filter-tag {
   background: rgb(208, 86, 72);
 }
+
 </style>
