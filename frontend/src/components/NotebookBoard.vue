@@ -97,8 +97,6 @@ export default defineComponent({
         snippetSummaries.value = snippets.value.map(i => {
           const title = i.title.trim()
           const body = i.body.trim()
-
-
           return `<b>${title}</b> ${body}`
         })
 
