@@ -5,14 +5,22 @@
       'new-snippet-area-editing',
     ]"
   >
+    <div class="header">
+      <div class="header-button">
+        <i class="bi-arrow-left" @click="backClicked"></i>
+      </div>
+      <div class="header-button" @click="trashClicked">
+        <i class="bi-trash"></i>
+      </div>
+    </div>
     <div>
       <input
         @keydown.enter="submitSnippet"
-        class="form-control"
+        class="form-control snippet-title"
         type="text"
         placeholder="Title"
         v-model="title"
-        @blur="saveSnippet"
+        @blur="submitSnippet"
       />
       <textarea
         ref="textAreaRef"
@@ -30,22 +38,6 @@
         @tags-changed="(newTags) => (tags = newTags)"
         @blur="submitSnippet"
       />
-
-      <div class="footer">
-        <div class="tags-container" v-if="parsedTags != undefined">
-          <p
-            v-for="tag in parsedTags"
-            :key="tag"
-            :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
-            @click="(evt) => tagClicked(evt, tag)"
-          >
-            {{ tag }}
-          </p>
-        </div>
-        <div>
-          <a class="link-primary"><i class="bi-trash" @click="deleteClicked"></i></a>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -57,6 +49,7 @@ import { newSnippet } from './../helpers/apiHelper';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuth0 } from '@auth0/auth0-vue';
 import { useMagicKeys } from '@vueuse/core'
+import { useRouter } from "vue-router";
 
 
 export default defineComponent({
@@ -73,13 +66,9 @@ export default defineComponent({
       type: Object,
       required: false,
     },
-    filterTags: {
-      type: Array,
-      required: true,
-    },
   },
 
-  emits: ['tagClicked', 'snippetSubmitted', 'cancelChanges'],
+  emits: ['tagClicked', 'snippetSubmitted', 'cancelChanges', 'backClicked'],
 
   setup(props, { emit }) {
     const { meta, enter } = useMagicKeys()
@@ -90,8 +79,10 @@ export default defineComponent({
     })
 
     const body = ref(props.snippet?.body ?? '')
-
+    const router = useRouter()
     
+    router.push(`/notebook/${props.notebookId}#${props.snippet.snippetId}`)
+
     const tag = ref('');
     const tags = ref(
       (props.snippet?.tags ?? []).filter((i) => i).map((i) => ({ text: i }))
@@ -148,6 +139,30 @@ export default defineComponent({
 
     const parsedTags = ref(props.snippet.tags.filter((t) => t !== ''));
 
+    const backClicked = () => {
+      router.push(`/notebook/${props.notebookId}`)
+      emit('backClicked')
+    }
+
+    const trashClicked = () => {
+      const snippetId =
+        props.snippet?.snippetId
+
+      newSnippet(
+        title.value ?? '',
+        body.value,
+        tags.value.map((tag) => tag.text).join() + ',trash',
+        props.notebookId,
+        userId,
+        snippetId
+      ).then((text) => {
+        console.log('Success', text);
+
+        backClicked()
+      });
+
+    }
+
     return {
       body,
       tag,
@@ -160,6 +175,8 @@ export default defineComponent({
       textAreaChange,
       tagClicked,
       parsedTags,
+      backClicked,
+      trashClicked,
     };
   },
 });
@@ -168,7 +185,7 @@ export default defineComponent({
 <style scoped>
 .new-snippet-area {
   background-color: lightgray;
-  padding: 0.5em;
+  /* padding: 0.5em; */
   border-radius: 0.5em;
   margin-bottom: 1em;
   /* width: 55%; */
@@ -187,6 +204,7 @@ export default defineComponent({
 .text-area {
   /* height: 10em; */
   min-height: 10em;
+  overflow-y: hidden;
 }
 
 .vue-tags-input {
@@ -219,5 +237,33 @@ export default defineComponent({
 
 a {
   margin-right: 1em;
+}
+
+.snippet-title {
+  font-weight: bold;
+}
+
+.header-button {
+  width: 2.5em;
+  height: 2.5em;
+  border-radius: 10em;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.header-button :hover {
+  background-color: white;
+  width: 2.5em;
+  height: 2.5em;
+  border-radius: 10em;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  cursor: pointer;
+}
+
+.header {
+  display: flex;
 }
 </style>

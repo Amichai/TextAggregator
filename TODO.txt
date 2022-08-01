@@ -14,3 +14,6 @@ TODO:
 Mobile -> condensed view. Clicking on a header opens up edit mode
 Thin desktop -> two columns. condensed view, and all the edit cards
 Desktop -> three columns condensed, cards, tags
+
+---
+I need a way to see the tags on a snippet

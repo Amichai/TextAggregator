@@ -271,7 +271,7 @@ export default defineComponent({
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  cursor: pointer;
+  cursor: pointer;    
 }
 
 .snippet-summary:hover {

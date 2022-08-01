@@ -2,16 +2,15 @@
   <div>
     <table>
       <tr>
-        <div v-for="(summary, index) in snippetSummaries" v-bind:key="index"
+        <div v-for="(snippet, index) in snippetSummaries" v-bind:key="index"
           :class="[
             'snippet-summary',
-            selectedSnippetIndices.includes(index) && 'selected-snippet-summary'
           ]"
           
-          @click="selectSummary(index)"
+          @click="selectSummary(snippet.snippet)"
           >
-          <i class="bi-grip-vertical" @click="deleteClicked"></i>
-          <span v-html="summary">
+          <!-- <i class="bi-grip-vertical" @click="deleteClicked"></i> -->
+          <span v-html="snippet.summary">
           </span>
         </div>
       </tr>
@@ -42,39 +41,57 @@ export default defineComponent({
     },
   },
 
-  emits: [],
+  emits: ['summarySelected'],
 
   setup(props, { emit }) {
     const snippetSummaries = ref([])
-    
-    watch(() => props.snippets, (newVal, oldVal) => {
-      snippetSummaries.value = props.snippets.map(i => {
+
+    const loadSnippets = () => {
+      if(props.filterTags.length == 0) {
+        snippetSummaries.value = props.snippets
+        .filter(i => !i.tags.includes('trash'))
+        .map(i => {
           const title = i.title.trim()
           const body = i.body.trim()
           const bodySingleLine = body.replaceAll('\n', ' ')
-          return `<b>${title}</b> ${bodySingleLine}`
+          return {
+            summary: `<b>${title}</b> ${bodySingleLine}`,
+            snippet: i,
+          }
         })
-    })
-
-    const selectedSnippets = ref([])
-    const selectedSnippetIndices = ref([])
-
-    const selectSummary = (index) => {
-      if(selectedSnippetIndices.value.includes(index)) {
-        selectedSnippetIndices.value = removeElement(selectedSnippetIndices.value, index)
-        selectedSnippets.value = removeElement(selectedSnippets.value, props.snippets[index])
       } else {
-        selectedSnippetIndices.value.push(index)
-        selectedSnippets.value.push(props.snippets[index])
+        snippetSummaries.value = props.snippets.filter(
+        (item) =>
+          item.tags
+            .map((tag) => tag)
+            .some((tagText) => props.filterTags.includes(tagText))
+        ).map(i => {
+          const title = i.title.trim()
+          const body = i.body.trim()
+          const bodySingleLine = body.replaceAll('\n', ' ')
+          return {
+            summary: `<b>${title}</b> ${bodySingleLine}`,
+            snippet: i,
+          }
+        })
       }
+    }
+    
+    watch(() => props.snippets, (newVal, oldVal) => {
+      loadSnippets()
+    })
+    
+    watch(() => props.filterTags, (newVal, oldVal) => {
+      loadSnippets()
+    }, {deep: true})
 
-      console.log(selectedSnippets.value)
+    const selectSummary = (snippet) => {  
+      emit('summarySelected', snippet)
     }
 
     return {
       selectSummary,
       snippetSummaries,
-      selectedSnippetIndices,
     };
   },
 });
@@ -93,6 +110,9 @@ table {
   overflow: hidden;
   cursor: pointer;
 
+  height: 2em;
+
+
   padding-bottom: 4px;
   padding-top: 4px;
   box-shadow: inset 0 -1px 0 0 rgb(100 121 143 / 12%);
@@ -100,18 +120,11 @@ table {
   margin-left: 6px;
   padding-left: 6px;
   margin-right: 6px;
-  
-
 }
 
 .snippet-summary:hover {
   box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
 }
-
-.selected-snippet-summary {
-  background-color: gray;
-}
-
 
 .bi-grip-vertical {
   cursor: grab;

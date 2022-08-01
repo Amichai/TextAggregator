@@ -42,11 +42,13 @@ export default defineComponent({
     const allTags = ref([]);
 
     watch(() => props.snippets, (newVal, oldVal) => {
-      const allTagsWithDuplicates = props.snippets.reduce(
+      const allTagsWithDuplicates = props.snippets
+      .filter(snippet => !snippet.tags.includes('trash'))
+      .reduce(
         (previous, current) => {
           return [...previous, ...current.tags];
         },
-        []
+        ['trash']
       );
 
       allTags.value = [...new Set(allTagsWithDuplicates.map(i => i.toLowerCase()))].filter((t) => t);
