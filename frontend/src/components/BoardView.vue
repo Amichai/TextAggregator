@@ -12,7 +12,8 @@
       />
     </div>
     <div class="snippets">
-      <button type="button" class="btn btn-primary bi-pencil new-button"
+      <button type="button" class="btn btn-default bi-pencil new-button"
+        v-if="!isSnippetSelected"
         @click="newPost"
       > New</button>
       <NewSnippetArea
@@ -180,9 +181,11 @@ export default defineComponent({
 
 .new-button {
   margin: 0 5% 0 5%;
+  padding: 10px;
   width: 10em;
-  background-color: #389c93;
-  border:none;
+  background-color: var(--theme-color2);
+  /* color:black; */
+  /* border:none; */
 }
 
 .snippets {

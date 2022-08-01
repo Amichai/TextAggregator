@@ -2,3 +2,27 @@
 .link-primary {
   cursor: pointer;
 }
+
+:root {
+/* --theme-color1:#6EB3CE;
+--theme-color2:#A7C9BF;
+--theme-color3:#D6DEBA;
+--theme-color4:#E2D2B1; */
+
+
+
+/* --theme-color4:#473B43;
+--theme-color3:#6B6562;
+--theme-color2:#A3886E;
+--theme-color1:#DCAE74; */
+
+
+--theme-color1:#80D8BC;
+--theme-color2:#BCBAB5;
+--theme-color3:#B49173;
+--theme-color4:#C25A56;
+--theme-color5:#BA4746;
+
+--tag-color:#5C6BC0;
+
+}

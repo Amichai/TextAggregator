@@ -52,7 +52,7 @@ export default defineComponent({
 
 <style scoped>
 .header {
-  background-color: #244673;
+  background-color: var(--theme-color2);
 }
 
 </style>

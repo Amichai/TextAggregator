@@ -33,12 +33,10 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { deleteSnippet } from './../helpers/apiHelper';
-import EditableTitle from './EditableTitle.vue';
 
 
 export default defineComponent({
   components: {
-    EditableTitle,
   },
 
   props: {
@@ -117,7 +115,7 @@ export default defineComponent({
   flex: 1;
 }
 .tag-p {
-  background: #389C93;
+  background-color: var(--tag-color);
   color: white;
   margin: 5px;
   padding: 2.5px 10px 2.5px 10px;

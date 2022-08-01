@@ -154,8 +154,8 @@ table {
 }
 
 .tag-p {
-  background: #ACCB9D;
-  color: black;
+  background-color: var(--tag-color);
+  color: white;
   margin: 5px;
   padding: 2.5px 10px 2.5px 10px;
   border-radius: 3px;

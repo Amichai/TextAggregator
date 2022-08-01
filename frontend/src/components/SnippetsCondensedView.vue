@@ -14,15 +14,11 @@
 
 <script lang="ts">
 import { defineComponent, computed, watch, onMounted, onUnmounted, ref, PropType } from 'vue';
-import BoardViewMobile from './BoardViewMobile.vue'
-import BoardViewDesktop from './BoardViewDesktop.vue'
 import PageNavbar from './PageNavbar.vue';
 import { removeElement } from "./../helpers/helpers";
 
 export default defineComponent({
   components: {
-    BoardViewMobile,
-    BoardViewDesktop,
     PageNavbar,
   },
 

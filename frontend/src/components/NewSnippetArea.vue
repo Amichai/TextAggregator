@@ -1,14 +1,14 @@
 <template>
   <div
-    :class="[
-      'new-snippet-area',
-      'new-snippet-area-editing',
-    ]"
+    class="new-snippet-area new-snippet-area-editing"
   >
     <div class="header">
+      
       <div class="header-button">
         <i class="bi-arrow-left" @click="backClicked"></i>
       </div>
+      
+
       <div class="header-button" @click="trashClicked">
         <i class="bi-trash"></i>
       </div>
@@ -192,7 +192,7 @@ export default defineComponent({
 }
 
 .new-snippet-area-editing {
-  width: 100%;
+  width: 90%;
 }
 
 .header-area {
@@ -221,7 +221,7 @@ export default defineComponent({
   flex: 1;
 }
 .tag-p {
-  background :#389C93;
+  background-color: var(--tag-color);
   color: white;
   margin: 5px;
   padding: 2.5px 10px 2.5px 10px;
@@ -244,7 +244,7 @@ a {
 }
 
 .header-button {
-  width: 2.5em;
+  width: 3em;
   height: 2.5em;
   border-radius: 10em;
   display: flex;
