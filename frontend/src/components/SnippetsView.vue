@@ -9,8 +9,16 @@
         class="snippet-summary"
         @click="selectSummary(snippet.snippet)"
         >
-        <td style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; width:100%"><span v-html="snippet.summary"/></td>
-        <td>TESTING</td>
+      <td class="snippet-column"><span v-html="snippet.summary"/></td>
+      <td class="tags-column" v-if="snippet.tags.length > 0">
+          <p v-for="(tag, index) in snippet.tags" v-bind:key="index"
+            @click="(ev) => tagClicked(ev, tag)"
+            :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
+          >
+            {{ tag }}
+          </p>
+
+        </td>
       </tr>
     </table>
   </div>
@@ -39,7 +47,7 @@ export default defineComponent({
     },
   },
 
-  emits: ['summarySelected'],
+  emits: ['summarySelected', 'tagClicked'],
 
   setup(props, { emit }) {
     const snippetSummaries = ref([])
@@ -55,6 +63,7 @@ export default defineComponent({
           return {
             summary: `<b>${title}</b> ${bodySingleLine}`,
             snippet: i,
+            tags: i.tags,
           }
         })
       } else {
@@ -70,6 +79,7 @@ export default defineComponent({
           return {
             summary: `<b>${title}</b> ${bodySingleLine}`,
             snippet: i,
+            tags: i.tags,
           }
         })
       }
@@ -87,9 +97,15 @@ export default defineComponent({
       emit('summarySelected', snippet)
     }
 
+    const tagClicked = (ev, tag) => {
+      ev.stopPropagation();
+      emit('tagClicked', tag)
+    }
+
     return {
       selectSummary,
       snippetSummaries,
+      tagClicked,
     };
   },
 });
@@ -122,11 +138,39 @@ table {
   margin-right: 6px;
 }
 
+.snippet-column {
+  white-space: nowrap;
+  text-overflow:ellipsis;
+  overflow: hidden;
+  width:100%
+}
+
 .snippet-summary:hover {
   box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
 }
 
 .bi-grip-vertical {
   cursor: grab;
+}
+
+.tag-p {
+  background: #ACCB9D;
+  color: black;
+  margin: 5px;
+  padding: 2.5px 10px 2.5px 10px;
+  border-radius: 3px;
+  font-size: 0.7em;
+  height: fit-content;
+  cursor: pointer;
+}
+
+.tags-column {
+  display: flex;
+  align-items: center
+
+}
+
+.filter-tag {
+  background: rgb(208, 86, 72);
 }
 </style>

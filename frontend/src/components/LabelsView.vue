@@ -72,8 +72,8 @@ export default defineComponent({
 
 <style scoped>
 .tag-p {
-  background: #5c6bc0;
-  color: white;
+  background: #Accb9d;
+  color: black;
   margin: 5px;
   padding: 2.5px 10px 2.5px 10px;
   border-radius: 3px;

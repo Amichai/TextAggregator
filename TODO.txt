@@ -17,3 +17,14 @@ Desktop -> three columns condensed, cards, tags
 
 ---
 I need a way to see the tags on a snippet
+
+
+F0EFB9
+ACCB9D
+389C93
+244673
+172831
+
+-----
+ - Change tags to editable categories
+ - When i edit a snippet, I should be updating a row not writing a new row (with a new created at)

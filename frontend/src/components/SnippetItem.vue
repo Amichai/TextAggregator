@@ -117,7 +117,7 @@ export default defineComponent({
   flex: 1;
 }
 .tag-p {
-  background: #5c6bc0;
+  background: #389C93;
   color: white;
   margin: 5px;
   padding: 2.5px 10px 2.5px 10px;

@@ -1,11 +1,9 @@
 <template>
 <div>
   <PageNavbar />
+      
   <div class="board-view">
     <div class="labels">
-      <button type="button" class="btn btn-primary bi-pencil new-button"
-        @click="newPost"
-      > New</button>
       <LabelsView 
         :notebookId="notebookId"
         :snippets="snippets"
@@ -14,6 +12,9 @@
       />
     </div>
     <div class="snippets">
+      <button type="button" class="btn btn-primary bi-pencil new-button"
+        @click="newPost"
+      > New</button>
       <NewSnippetArea
         v-if="isSnippetSelected"
         :notebookId="notebookId"
@@ -26,6 +27,7 @@
         :snippets="snippets"
         :filterTags="filterTags"
         @summarySelected="summarySelected"
+        @tagClicked="tagClicked"
       />
     </div>
   </div>
@@ -106,7 +108,14 @@ export default defineComponent({
         filterTags.value = removeElement(filterTags.value, tag)
       } else {
         filterTags.value = filterTags.value.concat([tag])
+
       }
+        const path = window.location.pathname;
+        if(filterTags.value.length > 0) {
+          router.push({path, query: { categories: filterTags.value.join(",") }})
+        } else {
+          router.push({path, query: {}})
+        }
     }
 
     const summarySelected = (snippet) => {
@@ -171,7 +180,9 @@ export default defineComponent({
 
 .new-button {
   margin: 0 5% 0 5%;
-  max-width: 10em;
+  width: 10em;
+  background-color: #389c93;
+  border:none;
 }
 
 .snippets {
