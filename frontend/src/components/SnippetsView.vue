@@ -1,18 +1,16 @@
 <template>
   <div>
-    <table>
-      <tr>
-        <div v-for="(snippet, index) in snippetSummaries" v-bind:key="index"
-          :class="[
-            'snippet-summary',
-          ]"
-          
-          @click="selectSummary(snippet.snippet)"
-          >
-          <!-- <i class="bi-grip-vertical" @click="deleteClicked"></i> -->
-          <span v-html="snippet.summary">
-          </span>
-        </div>
+    <table style="width: 100%;">
+      <colgroup>
+        <col width="100%" />
+        <col width="0%" />
+      </colgroup>
+      <tr v-for="(snippet, index) in snippetSummaries" v-bind:key="index"
+        class="snippet-summary"
+        @click="selectSummary(snippet.snippet)"
+        >
+        <td style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; width:100%"><span v-html="snippet.summary"/></td>
+        <td>TESTING</td>
       </tr>
     </table>
   </div>
@@ -111,6 +109,8 @@ table {
   cursor: pointer;
 
   height: 2em;
+
+  display: flex;
 
 
   padding-bottom: 4px;
