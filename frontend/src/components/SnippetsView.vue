@@ -7,7 +7,10 @@
         @click="selectSummary(snippet.snippet)"
       >
       <td class="grip"><i class="bi-grip-vertical"></i></td>
-      <td class="time-ago">{{snippet.timeAgo}}</td>
+      <td
+      class="time-ago"
+      v-show="!isMobile"
+      >{{snippet.timeAgo}}</td>
       <td class="snippet-column"><span v-html="snippet.summary"/></td>
       <td class="tags-column" v-if="snippet.tags.length > 0">
           <p v-for="(tag, index) in snippet.tags" v-bind:key="index"
@@ -45,6 +48,10 @@ export default defineComponent({
     filterTags: {
       type: Array as PropType<any>,
       required: true,
+    },
+    isMobile: {
+      type: Boolean,
+      default: false,
     },
   },
 

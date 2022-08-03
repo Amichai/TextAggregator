@@ -2,8 +2,11 @@
 <div>
   <PageNavbar />
       
-  <div class="board-view">
-    <div class="labels">
+  <div 
+  :class="['board-view',
+  isMobile && 'full-width']"
+  >
+    <div class="labels" v-show="!isMobile">
       <LabelsView 
         :notebookId="notebookId"
         :snippets="snippets"
@@ -11,7 +14,9 @@
         @tagClicked="tagClicked"
       />
     </div>
-    <div class="snippets">
+    <div 
+    :class="['snippets']"
+    >
       <button type="button" class="btn btn-default bi-pencil new-button"
         v-if="!isSnippetSelected"
         @click="newPost"
@@ -24,6 +29,7 @@
         @snippetSubmitted="snippetSubmitted"
       />
       <SnippetsView 
+        :isMobile="isMobile"
         v-show="!isSnippetSelected"
         :notebookId="notebookId"
         :snippets="snippets"
@@ -75,6 +81,14 @@ export default defineComponent({
     const selectedSnippet = ref(null)
 
     const router = useRouter()
+
+    onMounted(() => {
+      window.addEventListener("resize", onResize);
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener("resize", onResize);
+    })
 
     const snippetSubmitted = (snippetId) => {
       getSnippet(props.notebookId, snippetId, userId).then((updatedSnippet) => {
@@ -161,6 +175,14 @@ export default defineComponent({
       });
     }
 
+    const MOBILE_WIDTH = 760
+
+    const isMobile = ref(visualViewport.width <= MOBILE_WIDTH)
+    const onResize = () => {
+      isMobile.value = visualViewport.width <= MOBILE_WIDTH;
+    }
+
+
     return {
       snippets,
       tagClicked,
@@ -171,6 +193,7 @@ export default defineComponent({
       isSnippetSelected,
       newPost,
       snippetSubmitted,
+      isMobile,
     };
   },
 });
@@ -180,6 +203,11 @@ export default defineComponent({
 .board-view {
   display: grid;
   grid-template-columns: 10vw 88vw;
+}
+
+.full-width {
+  display: grid;
+  grid-template-columns: 100vw;
 }
 
 .labels {

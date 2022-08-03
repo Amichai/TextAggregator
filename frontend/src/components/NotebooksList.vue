@@ -58,7 +58,7 @@ export default defineComponent({
 <style scoped>
 .notebook {
   margin: 1.5em 0 1.5em 1.5em;
-  background-color: var(--theme-color4);
+  background-color: var(--theme-color1);
 
   padding: 1em;
   border-radius: 0.3em;
