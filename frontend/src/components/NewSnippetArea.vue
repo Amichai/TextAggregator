@@ -149,7 +149,7 @@ export default defineComponent({
           timeAgo.value = "*" + timeAgo.value
         }
         
-		}, 1000)
+		}, 800)
     })
 
     onBeforeUnmount(() => {

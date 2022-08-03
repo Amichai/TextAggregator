@@ -1,14 +1,13 @@
 <template>
   <div>
     <table style="width: 100%;">
-      <colgroup>
-        <col width="100%" />
-        <col width="0%" />
-      </colgroup>
-      <tr v-for="(snippet, index) in snippetSummaries" v-bind:key="index"
+      <tr v-for="(snippet, index) in snippetSummaries"              
+        v-bind:key="index"
         class="snippet-summary"
         @click="selectSummary(snippet.snippet)"
-        >
+      >
+      <td class="grip"><i class="bi-grip-vertical"></i></td>
+      <td class="time-ago">{{snippet.timeAgo}}</td>
       <td class="snippet-column"><span v-html="snippet.summary"/></td>
       <td class="tags-column" v-if="snippet.tags.length > 0">
           <p v-for="(tag, index) in snippet.tags" v-bind:key="index"
@@ -17,7 +16,6 @@
           >
             {{ tag }}
           </p>
-
         </td>
       </tr>
     </table>
@@ -27,6 +25,9 @@
 <script lang="ts">
 import { defineComponent, computed, watch, onMounted, onUnmounted, ref, PropType } from 'vue';
 import { removeElement } from "../helpers/helpers";
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import utc from 'dayjs/plugin/utc'
 
 export default defineComponent({
   components: {
@@ -64,6 +65,7 @@ export default defineComponent({
             summary: `<b>${title}</b> ${bodySingleLine}`,
             snippet: i,
             tags: i.tags,
+            timeAgo: dayjs.utc(i.updated).fromNow(),
           }
         })
       } else {
@@ -80,6 +82,7 @@ export default defineComponent({
             summary: `<b>${title}</b> ${bodySingleLine}`,
             snippet: i,
             tags: i.tags,
+            timeAgo: dayjs.utc(i.updated).fromNow(),
           }
         })
       }
@@ -170,7 +173,24 @@ table {
 
 }
 
+.time-ago {
+  min-width: 7em; 
+  font-size: small; 
+  text-align: left;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  font-style: italic;
+  
+}
+
 .filter-tag {
   background: rgb(208, 86, 72);
+}
+
+.grip {
+  display: flex;
+  align-items: center;
+
 }
 </style>
