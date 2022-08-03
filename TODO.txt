@@ -34,3 +34,5 @@ ACCB9D
 
   -  search bar
   - notebook titles? 
+
+  - cmd s to save

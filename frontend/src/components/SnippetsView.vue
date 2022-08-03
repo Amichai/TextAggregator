@@ -69,7 +69,7 @@ export default defineComponent({
           const body = i.body.trim()
           const bodySingleLine = body.replaceAll('\n', ' ')
           return {
-            summary: `<b>${title}</b> ${bodySingleLine}`,
+            summary: `<b>${title}</b> <span style="font-size:14px">${bodySingleLine}</span>`,
             snippet: i,
             tags: i.tags,
             timeAgo: dayjs.utc(i.updated).fromNow(),
@@ -86,7 +86,8 @@ export default defineComponent({
           const body = i.body.trim()
           const bodySingleLine = body.replaceAll('\n', ' ')
           return {
-            summary: `<b>${title}</b> ${bodySingleLine}`,
+            // summary: `<b>${title}</b> ${bodySingleLine}`,
+            summary: `<b>${title}</b> <span style="font-size:14px">${bodySingleLine}</span>`,
             snippet: i,
             tags: i.tags,
             timeAgo: dayjs.utc(i.updated).fromNow(),

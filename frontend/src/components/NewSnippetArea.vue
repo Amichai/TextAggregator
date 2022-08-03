@@ -12,7 +12,7 @@
         <i class="bi-trash"></i>
       </div>
     </div>
-    <div>
+    <div style="border-style: solid; border-width: 1px; border-color: gray">
       <input
         @keydown.enter="submitSnippet"
         class="form-control snippet-title"
@@ -149,7 +149,7 @@ export default defineComponent({
           timeAgo.value = "*" + timeAgo.value
         }
         
-		}, 800)
+		}, 500)
     })
 
     onBeforeUnmount(() => {
@@ -233,42 +233,35 @@ export default defineComponent({
   /* height: 10em; */
   min-height: 10em;
   overflow-y: hidden;
+
+  border-radius: 0;
+  
+  border:none
+}
+
+.text-area :focus {
+  box-shadow: none;
+}
+.text-area :focus-within {
+  box-shadow: none;
+}
+
+.snippet-title :focus {
+  box-shadow: none;
+}
+.snippet-title :focus-within {
+  box-shadow: none;
 }
 
 .vue-tags-input {
   width: 100%;
 }
 
-.footer {
-  display: flex;
-  align-items: center;
-}
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  flex: 1;
-}
-.tag-p {
-  background-color: var(--tag-color);
-  color: white;
-  margin: 5px;
-  padding: 2.5px 10px 2.5px 10px;
-  border-radius: 3px;
-  font-size: 0.7em;
-  height: fit-content;
-  cursor: pointer;
-}
-
-.filter-tag {
-  background: rgb(208, 86, 72);
-}
-
-a {
-  margin-right: 1em;
-}
-
 .snippet-title {
   font-weight: bold;
+  border-radius: 0;
+  box-shadow: none;
+  border:none
 }
 
 .header-button {
@@ -304,5 +297,34 @@ a {
 .footer {
   display: flex;
   justify-content: space-between
+}
+
+
+.footer {
+  display: flex;
+  align-items: center;
+}
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.tag-p {
+  background-color: var(--tag-color);
+  color: white;
+  margin: 5px;
+  padding: 2.5px 10px 2.5px 10px;
+  border-radius: 3px;
+  font-size: 0.7em;
+  height: fit-content;
+  cursor: pointer;
+}
+
+.filter-tag {
+  background: rgb(208, 86, 72);
+}
+
+a {
+  margin-right: 1em;
 }
 </style>

@@ -93,6 +93,11 @@ export default defineComponent({
     const snippetSubmitted = (snippetId) => {
       getSnippet(props.notebookId, snippetId, userId).then((updatedSnippet) => {
         selectedSnippet.value = updatedSnippet
+
+        const matchedSnippet = snippets.value.filter(i => i.snippetId === snippetId)[0]
+        matchedSnippet.title = updatedSnippet.title
+        matchedSnippet.body = updatedSnippet.body
+        matchedSnippet.tags = updatedSnippet.tags
       })
     }
 
