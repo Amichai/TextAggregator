@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="root">
   <PageNavbar />
       
   <div 
@@ -205,6 +205,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.root {
+  background-color: var(--background-color);
+}
+
 .board-view {
   display: grid;
   grid-template-columns: 10vw 88vw;
@@ -225,6 +229,7 @@ export default defineComponent({
   padding: 10px;
   width: 10em;
   background-color: var(--theme-color2);
+  margin-bottom: 1em;
   /* color:black; */
   /* border:none; */
 }

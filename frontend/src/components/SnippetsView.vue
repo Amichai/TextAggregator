@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="snippets-view">
     <table style="width: 100%;">
       <tr v-for="(snippet, index) in snippetSummaries"              
         v-bind:key="index"
@@ -200,5 +200,9 @@ table {
   display: flex;
   align-items: center;
 
+}
+
+.snippets-view {
+  background: white;
 }
 </style>
