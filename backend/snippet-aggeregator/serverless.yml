@@ -85,6 +85,13 @@ functions:
           path: /updateNotebook
           method: put
 
+  updateSnippet:
+    handler: handler.updateSnippet
+    events:
+      - httpApi:
+          path: /updateSnippet
+          method: put
+
   deleteSnippet:
     handler: handler.deleteSnippet
     events:

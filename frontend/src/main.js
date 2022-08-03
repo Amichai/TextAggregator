@@ -13,6 +13,33 @@ import vClickOutside from 'click-outside-vue3'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap';
 
+import dayjs from 'dayjs'
+import updateLocale from 'dayjs/plugin/updateLocale'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(updateLocale)
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
+
+dayjs.updateLocale('en', {
+  relativeTime: {
+    future: 'in %s',
+    past: '%s ago',
+    s: 'a few seconds',
+    m: 'a minute',
+    mm: '%d mins',
+    h: 'an hour',
+    hh: '%d hours',
+    d: 'a day',
+    dd: '%d days',
+    M: 'a month',
+    MM: '%d months',
+    y: 'a year',
+    yy: '%d years',
+  },
+})
+
 const app = createApp(App);
 // Make sure to _use_ the router instance to make the
 // whole app router-aware.

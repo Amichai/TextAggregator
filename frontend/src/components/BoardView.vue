@@ -21,6 +21,7 @@
         :notebookId="notebookId"
         :snippet="selectedSnippet"
         @backClicked="backClicked"
+        @snippetSubmitted="snippetSubmitted"
       />
       <SnippetsView 
         v-show="!isSnippetSelected"
@@ -41,7 +42,7 @@ import PageNavbar from './PageNavbar.vue';
 import LabelsView from './LabelsView.vue';
 import NewSnippetArea from './NewSnippetArea.vue';
 import SnippetsView from './SnippetsView.vue';
-import { getNotebook, newSnippet } from './../helpers/apiHelper';
+import { getNotebook, newSnippet, getSnippet, updateSnippet } from './../helpers/apiHelper';
 import { removeElement } from "./../helpers/helpers";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'vue-router';
@@ -74,6 +75,12 @@ export default defineComponent({
     const selectedSnippet = ref(null)
 
     const router = useRouter()
+
+    const snippetSubmitted = (snippetId) => {
+      getSnippet(props.notebookId, snippetId, userId).then((updatedSnippet) => {
+        selectedSnippet.value = updatedSnippet
+      })
+    }
 
     const loadNotebook = () => {
       getNotebook(props.notebookId).then((json) => {
@@ -163,6 +170,7 @@ export default defineComponent({
       backClicked,
       isSnippetSelected,
       newPost,
+      snippetSubmitted,
     };
   },
 });

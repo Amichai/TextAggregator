@@ -248,6 +248,39 @@ def updateNotebook(event, context):
     return response
 
 
+def updateSnippet(event, context):
+    print("UPDATE SNIPPET")
+    print(event)
+
+    body = json.loads(event['body'])
+
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('TA_Snippets')
+
+    notebookId = body['notebookId']
+    userId = body['userId']
+    snippetId = body['snippetId']
+    
+
+    update_result = table.update_item(
+        Key={
+            'notebookId': notebookId,
+            'userId-snippetId': '{}-{}'.format(userId, snippetId)},
+        UpdateExpression="set body = :b, title = :tt, tags = :tg, updated = :up",
+         ExpressionAttributeValues={
+        ':b': body['body'],
+        ':tt': body['title'],
+        ':tg': body['tags'],
+        ':up': getTimeStr(),
+    })
+
+
+    response = {"statusCode": 200, "body": json.dumps(update_result)}
+
+    return response
+
+
+
 def newSnippet(event, context):
     print("NEW SNIPPET")
     print(event)
@@ -268,6 +301,7 @@ def newSnippet(event, context):
         'userId': userId,
         'snippetId': snippetId,
         'created': timestamp,
+        'updated': timestamp,
         'title': body['title'],
         'body': body['body'],
         'tags': body['tags'],
@@ -311,16 +345,29 @@ def deleteSnippet(event, context):
 
 
 if __name__ == "__main__":
-
-    notebookId = "5c5dcfe647794baabe7649da394cf5b4"
-    snippetId = "0ba76097490e48fdb00806faf22bdf6a"
-    userId = "amichai"
+    notebookId = "1e47125270194237a3bc290e81a3980d"
+    snippetId = "3399530578dd40f8ac3db7f8bd45bf1b"
+    userId = "google-oauth2|103185913888289723018"
 
     # queryStringParameters = event['queryStringParameters']
     # notebookId = queryStringParameters['notebookId']
 
-    result = deleteSnippet({'queryStringParameters': {'notebookId': notebookId, 'snippetId': snippetId, 'userId': userId}}, {})
-    print(result)
+    # result = deleteSnippet({'queryStringParameters': {'notebookId': notebookId, 'snippetId': snippetId, 'userId': userId}}, {})
+    # print(result)
+
+    evt = {
+        'body': 
+        json.dumps({
+            'body': 'updated body',
+            'title': 'updated title',
+            'tags': 't1,t2',
+            'notebookId': notebookId,
+            'userId': userId,
+            'snippetId': snippetId,
+        })
+    }
+
+    updateSnippet(evt, None)
 
 
 # user authentication

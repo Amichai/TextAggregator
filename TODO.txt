@@ -26,5 +26,16 @@ ACCB9D
 172831
 
 -----
- - Change tags to editable categories
+ 
  - When i edit a snippet, I should be updating a row not writing a new row (with a new created at)
+- show save status. indicate if there are unsaved changes
+ - don't if there is no change
+  - new text editor: https://prosemirror.net/
+
+  - multi-line snippet summaries when the width gets short
+
+  -Snippet summaries should have a working updated time
+
+  - drag and drop to sort/order
+
+  -  search bar

@@ -3,11 +3,10 @@
     class="new-snippet-area new-snippet-area-editing"
   >
     <div class="header">
-      
+
       <div class="header-button">
         <i class="bi-arrow-left" @click="backClicked"></i>
       </div>
-      
 
       <div class="header-button" @click="trashClicked">
         <i class="bi-trash"></i>
@@ -30,26 +29,34 @@
         @input="textAreaChange"
         @blur="submitSnippet"
       ></textarea>
-      <VueTagsInput
-        class="vue-tags-input"
-        placeholder="Tags"
-        v-model="tag"
-        :tags="tags"
-        @tags-changed="(newTags) => (tags = newTags)"
-        @blur="submitSnippet"
-      />
+      <div class="footer">
+        <VueTagsInput
+          class="vue-tags-input"
+          placeholder="Tags"
+          v-model="tag"
+          :tags="tags"
+          @tags-changed="(newTags) => (tags = newTags)"
+          @blur="submitSnippet"
+        />
+
+        <div class="time-ago">
+          {{timeAgo}}
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch, watchEffect } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch, watchEffect, onBeforeUnmount } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
-import { newSnippet } from './../helpers/apiHelper';
-import { v4 as uuidv4 } from 'uuid';
+import { updateSnippet, getSnippet } from './../helpers/apiHelper';
 import { useAuth0 } from '@auth0/auth0-vue';
 import { useMagicKeys } from '@vueuse/core'
 import { useRouter } from "vue-router";
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import utc from 'dayjs/plugin/utc'
 
 
 export default defineComponent({
@@ -80,7 +87,7 @@ export default defineComponent({
 
     const body = ref(props.snippet?.body ?? '')
     const router = useRouter()
-    
+
     router.push(`/notebook/${props.notebookId}#${props.snippet.snippetId}`)
 
     const tag = ref('');
@@ -103,28 +110,50 @@ export default defineComponent({
       }
 
       const snippetId =
-        props.snippet?.snippetId ?? uuidv4().replaceAll('-', '');
+        props.snippet?.snippetId;
 
 
-      newSnippet(
+      updateSnippet(
         title.value ?? '',
         body.value,
         tags.value.map((tag) => tag.text).join(),
         props.notebookId,
         userId,
-        snippetId
+        snippetId,
       ).then((text) => {
         console.log('Success', text);
 
-        emit('snippetSubmitted');
+        emit('snippetSubmitted', snippetId);
       });
     };
 
     const textAreaRef = ref(null)
 
+    var polling;
+
+    const timeAgo = ref('')
+    const isChangeUnsaved = ref(false)
+
     onMounted(() => {
       textAreaRef.value.style.height = "";
       textAreaRef.value.style.height = textAreaRef.value.scrollHeight + "px"
+
+      polling = setInterval(() => {
+        timeAgo.value = dayjs.utc(props.snippet.updated).fromNow()
+
+        isChangeUnsaved.value = props.snippet.title !== title.value 
+          || props.snippet.body !== body.value
+          // || props.snippet.tags != tags.value
+
+        if (isChangeUnsaved.value) {
+          timeAgo.value = "*" + timeAgo.value
+        }
+        
+		}, 1000)
+    })
+
+    onBeforeUnmount(() => {
+      clearInterval(polling)
     })
 
     const textAreaChange = () => {
@@ -148,7 +177,7 @@ export default defineComponent({
       const snippetId =
         props.snippet?.snippetId
 
-      newSnippet(
+      updateSnippet(
         title.value ?? '',
         body.value,
         tags.value.map((tag) => tag.text).join() + ',trash',
@@ -157,10 +186,8 @@ export default defineComponent({
         snippetId
       ).then((text) => {
         console.log('Success', text);
-
         backClicked()
       });
-
     }
 
     return {
@@ -177,6 +204,7 @@ export default defineComponent({
       parsedTags,
       backClicked,
       trashClicked,
+      timeAgo,
     };
   },
 });
@@ -263,7 +291,18 @@ a {
   cursor: pointer;
 }
 
+.time-ago {
+  margin-right: 1em;
+  font-size: small;
+  font-style: italic;
+}
+
 .header {
   display: flex;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between
 }
 </style>

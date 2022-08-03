@@ -76,6 +76,43 @@ export const newSnippet = async (
   }
 };
 
+export const updateSnippet = async (
+  title,
+  body,
+  tags,
+  notebookId,
+  userId,
+  snippetId,
+) => {
+  const post = {
+    title,
+    body,
+    tags,
+    notebookId,
+    userId,
+    snippetId,
+  };
+
+  const raw = JSON.stringify(post);
+
+  const requestOptions = {
+    method: 'PUT',
+    body: raw,
+  };
+
+  try {
+    const response = await fetch(
+      'https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/updateSnippet',
+      requestOptions
+    );
+    const data = await response.text();
+    return data;
+  } catch (error) {
+    console.log('error', error);
+    return null;
+  }
+};
+
 export const deleteSnippet = async (notebookId, userId, snippetId) => {
   const requestOptions = {
     method: 'DELETE',
