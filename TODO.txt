@@ -27,12 +27,14 @@ ACCB9D
 
 -----
  
- - don't save/update if there is no change!
   - new text editor: https://prosemirror.net/
 
   - drag and drop to sort/order
 
   -  search bar
+
   - notebook titles? 
 
-  - cmd s to save
+   - preserve the tag filter when navigating between routes
+
+ - I should be able to hit the back button to save my changes!

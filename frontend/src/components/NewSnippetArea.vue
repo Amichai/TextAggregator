@@ -14,7 +14,7 @@
     </div>
     <div>
       <div style="border-style: solid; border-width: 1px; border-color: gray">
-        <div>
+        <div style="overflow: auto; background-color: white; height: 70vh">
           <input
             @keydown.enter="submitSnippet"
             class="form-control snippet-title"
@@ -23,12 +23,11 @@
             v-model="title"
             @blur="submitSnippet"
           />
-          <textarea
-            class="form-control text-area"
-            placeholder="New post here!"
-            v-model="body"
-            @blur="submitSnippet"
-          ></textarea>
+          <contenteditable class="form-control text-area"
+          v-model="body"
+           tag="div" :contenteditable="true"
+          @blur="submitSnippet">
+          </contenteditable>
         </div>
         </div>
         <div class="footer">
@@ -58,10 +57,12 @@ import { useRouter } from "vue-router";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
+import contenteditable from 'vue-contenteditable';
 
 export default defineComponent({
   components: {
     VueTagsInput,
+    contenteditable,
   },
 
   props: {
@@ -250,13 +251,14 @@ export default defineComponent({
   /* height: 10em; */
   min-height: 10em;
 
-  height: 60vh;
+  /* height: 60vh;
   max-height: 60vh;
-  min-height: 60vh;
+  min-height: 60vh; */
 
   border-radius: 0;
   
-  border:none
+  border:none;
+  overflow: auto;
 }
 
 * :focus {

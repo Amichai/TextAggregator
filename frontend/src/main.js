@@ -12,6 +12,7 @@ import vClickOutside from 'click-outside-vue3'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap';
+import contenteditable from 'vue-contenteditable'
 
 import dayjs from 'dayjs'
 import updateLocale from 'dayjs/plugin/updateLocale'
@@ -43,6 +44,7 @@ dayjs.updateLocale('en', {
 const app = createApp(App);
 // Make sure to _use_ the router instance to make the
 // whole app router-aware.
+// app.use(contenteditable)
 app.use(router);
 app.use(vClickOutside);
 

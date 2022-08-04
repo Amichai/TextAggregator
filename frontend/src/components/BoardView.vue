@@ -176,8 +176,7 @@ export default defineComponent({
       ).then((text) => {
         loadNotebook();
 
-        const query = filterTags.value.length > 0 ? { categories: filterTags.value.join(",") } : {}
-        router.push({path: `/notebook/${props.notebookId}#${uuid}`, query})
+        router.push(`/notebook/${props.notebookId}#${uuid}`)
       });
     }
 
