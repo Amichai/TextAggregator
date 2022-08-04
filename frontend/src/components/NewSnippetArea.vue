@@ -12,7 +12,8 @@
         <i class="bi-trash"></i>
       </div>
     </div>
-    <div style="border-style: solid; border-width: 1px; border-color: gray">
+    <div>
+      <div style="border-style: solid; border-width: 1px; border-color: gray">
       <input
         @keydown.enter="submitSnippet"
         class="form-control snippet-title"
@@ -29,6 +30,7 @@
         @input="textAreaChange"
         @blur="submitSnippet"
       ></textarea>
+      </div>
       <div class="footer">
         <VueTagsInput
           class="vue-tags-input"
@@ -58,7 +60,6 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 
-
 export default defineComponent({
   components: {
     VueTagsInput,
@@ -81,8 +82,9 @@ export default defineComponent({
     const { meta, enter } = useMagicKeys()
 
     watchEffect(() => {
-      if (meta.value && enter.value)
+      if (meta.value && enter.value) {
         submitSnippet()
+      }
     })
 
     const body = ref(props.snippet?.body ?? '')
@@ -171,10 +173,7 @@ export default defineComponent({
       polling = setInterval(() => {
         timeAgo.value = dayjs.utc(props.snippet.updated).fromNow()
 
-        // isChangeUnsaved.value = props.snippet.title !== title.value 
-        //   || props.snippet.body !== body.value
-          // || props.snippet.tags != tags.value
-          isChangeUnsaved.value = isSnippetModified(props.snippet)
+        isChangeUnsaved.value = isSnippetModified(props.snippet)
 
         if (isChangeUnsaved.value) {
           timeAgo.value = "*" + timeAgo.value
@@ -270,17 +269,7 @@ export default defineComponent({
   border:none
 }
 
-.text-area :focus {
-  box-shadow: none !important;
-}
-.text-area :focus-within {
-  box-shadow: none !important;
-}
-
-.snippet-title :focus {
-  box-shadow: none !important;
-}
-.snippet-title :focus-within {
+* :focus {
   box-shadow: none !important;
 }
 

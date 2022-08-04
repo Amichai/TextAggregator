@@ -1,10 +1,9 @@
 <template>
 <div class="root">
   <PageNavbar />
-      
   <div 
-  :class="['board-view',
-  isMobile && 'full-width']"
+    :class="['board-view',
+    isMobile && 'full-width']"
   >
     <div class="labels" v-show="!isMobile">
       <LabelsView 
@@ -15,8 +14,7 @@
       />
     </div>
     <div 
-    :class="['snippets']"
-    >
+      class="snippets">
       <button type="button" class="btn btn-default bi-pencil new-button"
         v-if="!isSnippetSelected"
         @click="newPost"
