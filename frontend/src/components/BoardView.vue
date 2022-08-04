@@ -175,7 +175,9 @@ export default defineComponent({
         uuid
       ).then((text) => {
         loadNotebook();
-        router.push(`/notebook/${props.notebookId}#${uuid}`)
+
+        const query = filterTags.value.length > 0 ? { categories: filterTags.value.join(",") } : {}
+        router.push({path: `/notebook/${props.notebookId}#${uuid}`, query})
       });
     }
 

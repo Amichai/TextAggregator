@@ -14,33 +14,32 @@
     </div>
     <div>
       <div style="border-style: solid; border-width: 1px; border-color: gray">
-      <input
-        @keydown.enter="submitSnippet"
-        class="form-control snippet-title"
-        type="text"
-        placeholder="Title"
-        v-model="title"
-        @blur="submitSnippet"
-      />
-      <textarea
-        ref="textAreaRef"
-        class="form-control text-area"
-        placeholder="New post here!"
-        v-model="body"
-        @input="textAreaChange"
-        @blur="submitSnippet"
-      ></textarea>
-      </div>
-      <div class="footer">
-        <VueTagsInput
-          class="vue-tags-input"
-          placeholder="Tags"
-          v-model="tag"
-          :tags="tags"
-          @tags-changed="(newTags) => (tags = newTags)"
-          @blur="submitSnippet"
-        />
-
+        <div>
+          <input
+            @keydown.enter="submitSnippet"
+            class="form-control snippet-title"
+            type="text"
+            placeholder="Title"
+            v-model="title"
+            @blur="submitSnippet"
+          />
+          <textarea
+            class="form-control text-area"
+            placeholder="New post here!"
+            v-model="body"
+            @blur="submitSnippet"
+          ></textarea>
+        </div>
+        </div>
+        <div class="footer">
+          <VueTagsInput
+            class="vue-tags-input"
+            placeholder="Tags"
+            v-model="tag"
+            :tags="tags"
+            @tags-changed="(newTags) => (tags = newTags)"
+            @blur="submitSnippet"
+          />
         <div class="time-ago">
           {{timeAgo}}
         </div>
@@ -131,8 +130,6 @@ export default defineComponent({
       });
     };
 
-    const textAreaRef = ref(null)
-
     var polling;
 
     const timeAgo = ref('')
@@ -167,9 +164,6 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      textAreaRef.value.style.height = "";
-      textAreaRef.value.style.height = textAreaRef.value.scrollHeight + "px"
-
       polling = setInterval(() => {
         timeAgo.value = dayjs.utc(props.snippet.updated).fromNow()
 
@@ -185,11 +179,6 @@ export default defineComponent({
     onBeforeUnmount(() => {
       clearInterval(polling)
     })
-
-    const textAreaChange = () => {
-      textAreaRef.value.style.height = "";
-      textAreaRef.value.style.height = textAreaRef.value.scrollHeight + "px"
-    }
 
     const tagClicked = (evt, tagText) => {
       evt.stopPropagation();
@@ -228,8 +217,6 @@ export default defineComponent({
       submitSnippet,
 
       cancelChanges,
-      textAreaRef,
-      textAreaChange,
       tagClicked,
       parsedTags,
       backClicked,
@@ -262,7 +249,10 @@ export default defineComponent({
 .text-area {
   /* height: 10em; */
   min-height: 10em;
-  overflow-y: hidden;
+
+  height: 60vh;
+  max-height: 60vh;
+  min-height: 60vh;
 
   border-radius: 0;
   
