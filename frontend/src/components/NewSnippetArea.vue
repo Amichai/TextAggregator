@@ -109,9 +109,12 @@ export default defineComponent({
         return
       }
 
+      if(!isSnippetModified(props.snippet)) {
+        return
+      }
+
       const snippetId =
         props.snippet?.snippetId;
-
 
       updateSnippet(
         title.value ?? '',
@@ -122,7 +125,6 @@ export default defineComponent({
         snippetId,
       ).then((text) => {
         console.log('Success', text);
-
         emit('snippetSubmitted', snippetId);
       });
     };
@@ -134,6 +136,34 @@ export default defineComponent({
     const timeAgo = ref('')
     const isChangeUnsaved = ref(false)
 
+    const isSnippetModified = (snippet) => {
+      var isModified = false
+      isModified = snippet.title !== title.value 
+          || snippet.body !== body.value
+
+      if(isModified) {
+        return true
+      }
+
+      const snippetTags = snippet.tags
+
+      if(snippetTags.length != tags.value.length) {
+        console.log("tag length changed")
+        return true
+      }
+
+      const tagTexts = tags.value.map(i => i.text)
+
+      if(!snippetTags.every((element) => {
+        return tagTexts.includes(element)
+      })) {
+        console.log("tag contents are different")
+        return true
+      }
+
+      return false
+    }
+
     onMounted(() => {
       textAreaRef.value.style.height = "";
       textAreaRef.value.style.height = textAreaRef.value.scrollHeight + "px"
@@ -141,9 +171,10 @@ export default defineComponent({
       polling = setInterval(() => {
         timeAgo.value = dayjs.utc(props.snippet.updated).fromNow()
 
-        isChangeUnsaved.value = props.snippet.title !== title.value 
-          || props.snippet.body !== body.value
+        // isChangeUnsaved.value = props.snippet.title !== title.value 
+        //   || props.snippet.body !== body.value
           // || props.snippet.tags != tags.value
+          isChangeUnsaved.value = isSnippetModified(props.snippet)
 
         if (isChangeUnsaved.value) {
           timeAgo.value = "*" + timeAgo.value
@@ -240,17 +271,17 @@ export default defineComponent({
 }
 
 .text-area :focus {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 .text-area :focus-within {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .snippet-title :focus {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 .snippet-title :focus-within {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .vue-tags-input {
