@@ -22,7 +22,7 @@
       <NewSnippetArea
         v-if="isSnippetSelected"
         :notebookId="notebookId"
-        :snippet="selectedSnippet"
+        :snippetId="selectedSnippetId"
         :userId="userId"
         @backClicked="backClicked"
         @snippetSubmitted="snippetSubmitted"
@@ -80,7 +80,7 @@ export default defineComponent({
 
     const filterTags = ref([]);
 
-    const selectedSnippet = ref(null)
+    const selectedSnippetId = ref(null)
 
     const router = useRouter()
 
@@ -101,7 +101,7 @@ export default defineComponent({
     const snippetUpdated = (updatedSnippet) => {
       updatedSnippet.tags = parseTags(updatedSnippet.tags)
       const snippetId = updatedSnippet.snippetId
-      selectedSnippet.value = updatedSnippet
+      selectedSnippetId.value = snippetId
 
       const matchedSnippet = snippets.value.filter(i => i.snippetId === snippetId)[0]
       matchedSnippet.title = updatedSnippet.title
@@ -130,8 +130,7 @@ export default defineComponent({
         if (parts.length > 1) {
           const snippetId = parts[1]
           console.log(snippetId)
-          const matched = snippets.value.find(snip => snip.snippetId == snippetId)
-          selectedSnippet.value = matched
+          selectedSnippetId.value = snippetId
         }
       });
     };
@@ -154,20 +153,20 @@ export default defineComponent({
     }
 
     const summarySelected = (snippet) => {
-      if(selectedSnippet.value === snippet) {
-        selectedSnippet.value = undefined;
+      if(selectedSnippetId.value === snippet.snippetId) {
+        selectedSnippetId.value = undefined;
         return
       }
 
-      selectedSnippet.value = snippet
+      selectedSnippetId.value = snippet.snippetId
     }
 
     const backClicked = () => {
-      selectedSnippet.value = undefined
+      selectedSnippetId.value = undefined
       loadNotebook();
     }
 
-    const isSnippetSelected = computed(() => !!selectedSnippet.value)
+    const isSnippetSelected = computed(() => !!selectedSnippetId.value)
 
     const { user } = useAuth0();
     const userId = user.value.sub
@@ -207,7 +206,7 @@ export default defineComponent({
       tagClicked,
       filterTags,
       summarySelected,
-      selectedSnippet,
+      selectedSnippetId,
       backClicked,
       isSnippetSelected,
       newPost,

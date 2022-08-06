@@ -1,6 +1,7 @@
 <template>
   <div
     class="new-snippet-area new-snippet-area-editing"
+    v-if="isSnippetLoaded"
   >
     <div class="header">
       <div class="header-button">
@@ -70,8 +71,8 @@ export default defineComponent({
       type: String,
       default: '',
     },
-    snippet: {
-      type: Object,
+    snippetId: {
+      type: String,
       required: false,
     },
     userId: {
@@ -85,29 +86,37 @@ export default defineComponent({
   setup(props, { emit }) {
     const { meta, enter } = useMagicKeys()
 
+    const initialSnippet = ref(null)
+    const isSnippetLoaded = ref(false)
+    const body = ref(null)
+    const tag = ref('');
+
+    const tags = ref(null);
+
+    const title = ref(null);
+
+    getSnippet(props.notebookId, props.snippetId, props.userId)
+      .then((snippet) => {
+        initialSnippet.value = snippet
+        initialSnippet.value.tags = parseTags(snippet.tags)
+        body.value = snippet.body
+        title.value = snippet.title
+        tags.value = snippet.tags.filter(i => i !== '').map((i) => ({ text: i }))
+        isSnippetLoaded.value = true
+    })
+
     watchEffect(() => {
       if (meta.value && enter.value) {
         submitSnippet()
       }
     })
 
-    const body = ref(props.snippet?.body ?? '')
     const router = useRouter()
 
-    router.push(`/notebook/${props.notebookId}#${props.snippet.snippetId}`)
-
-    const tag = ref('');
-    const tags = ref(
-      (props.snippet?.tags ?? []).filter((i) => i).map((i) => ({ text: i }))
-    );
-
-    const title = ref(props.snippet?.title ?? '');
-
-    const { user } = useAuth0();
-    const userId = user.value.sub
+    router.push(`/notebook/${props.notebookId}#${props.snippetId}`)
 
     const cancelChanges = () => {
-      emit('cancelChanges', props.snippet);
+      emit('cancelChanges', initialSnippet);
     };
 
     const submitSnippet = async () => {
@@ -115,23 +124,27 @@ export default defineComponent({
         return
       }
 
-      if(!isSnippetModified(props.snippet)) {
+      if(!isSnippetModified(initialSnippet.value)) {
         return
       }
 
       const snippetId =
-        props.snippet?.snippetId;
+        props.snippetId;
 
       updateSnippet(
         title.value ?? '',
         body.value,
         tags.value.map((tag) => tag.text).join(),
         props.notebookId,
-        userId,
+        props.userId,
         snippetId,
       ).then((text) => {
         console.log('Success', text);
         emit('snippetSubmitted', snippetId);
+
+        initialSnippet.value.title = title.value
+        initialSnippet.value.body = body.value
+        initialSnippet.value.tags = tags.value.map(i => i.text)
       });
     };
 
@@ -146,6 +159,7 @@ export default defineComponent({
           || snippet.body !== body.value
 
       if(isModified) {
+        console.log("is modified")
         return true
       }
 
@@ -170,9 +184,9 @@ export default defineComponent({
 
     onMounted(() => {
       isSavedPoll = setInterval(() => {
-        timeAgo.value = dayjs.utc(props.snippet.updated).fromNow()
+        timeAgo.value = dayjs.utc(initialSnippet.updated).fromNow()
 
-        isChangeUnsaved.value = isSnippetModified(props.snippet)
+        isChangeUnsaved.value = isSnippetModified(initialSnippet.value)
 
         if (isChangeUnsaved.value) {
           timeAgo.value = "*" + timeAgo.value
@@ -186,7 +200,7 @@ export default defineComponent({
         console.log("get snippet", dayjs().format())
         getSnippet(
           props.notebookId,
-          props.snippet.snippetId,
+          props.snippetId,
           props.userId,
         ).then((updatedSnippet) => {
           emit('snippetUpdated', updatedSnippet)
@@ -194,6 +208,11 @@ export default defineComponent({
           title.value = updatedSnippet.title
           body.value = updatedSnippet.body
           tags.value = updatedSnippet.tags.filter(i => i !== '').map((i) => ({ text: i }))
+
+
+          initialSnippet.value.title = title.value
+          initialSnippet.value.body = body.value
+          initialSnippet.value.tags = tags.value.map(i => i.text)
         })
         
 		  }, 10000)
@@ -209,8 +228,6 @@ export default defineComponent({
       emit('tagClicked', tagText);
     };
 
-    const parsedTags = ref(props.snippet.tags.filter((t) => t !== ''));
-
     const backClicked = () => {
       router.push(`/notebook/${props.notebookId}`)
       emit('backClicked')
@@ -218,14 +235,14 @@ export default defineComponent({
 
     const trashClicked = () => {
       const snippetId =
-        props.snippet?.snippetId
+        props.snippetId
 
       updateSnippet(
         title.value ?? '',
         body.value,
         tags.value.map((tag) => tag.text).join() + ',trash',
         props.notebookId,
-        userId,
+        props.userId,
         snippetId
       ).then((text) => {
         console.log('Success', text);
@@ -242,10 +259,10 @@ export default defineComponent({
 
       cancelChanges,
       tagClicked,
-      parsedTags,
       backClicked,
       trashClicked,
       timeAgo,
+      isSnippetLoaded,
     };
   },
 });
