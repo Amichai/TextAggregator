@@ -5,12 +5,24 @@
         v-bind:key="index"
         class="snippet-summary"
         @click="selectSummary(snippet.snippet)"
+        @mousemove="snippet.isHovering = true"
+        @mouseleave="snippet.isHovering = false"
       >
-      <td class="grip"><i class="bi-grip-vertical"></i></td>
+      <td v-if="snippet.isHovering"
+        class="time-ago"
+        v-show="!isMobile"
+      >
+        <i class="bi-grip-vertical icon"></i>
+        <i class="bi-trash icon" 
+          @click="(evt) => trashClicked(evt, snippet)"
+        ></i>
+      </td>
       <td
-      class="time-ago"
-      v-show="!isMobile"
-      >{{snippet.timeAgo}}</td>
+        v-if="!snippet.isHovering"
+        class="time-ago"
+        v-show="!isMobile"
+      >{{snippet.timeAgo}}
+      </td>
       <td class="snippet-column"><span v-html="snippet.summary"/></td>
       <td class="tags-column" v-if="snippet.tags.length > 0">
           <p v-for="(tag, index) in snippet.tags" v-bind:key="index"
@@ -30,6 +42,7 @@ import { defineComponent, computed, watch, onMounted, onUnmounted, ref, PropType
 import { removeElement } from "../helpers/helpers";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { updateNotebook, updateSnippet } from './../helpers/apiHelper';
 import utc from 'dayjs/plugin/utc'
 
 export default defineComponent({
@@ -45,6 +58,10 @@ export default defineComponent({
       type: Array as PropType<any>,
       required: true,
     },
+    userId: {
+      type: String,
+      required: true,
+    },
     filterTags: {
       type: Array as PropType<any>,
       required: true,
@@ -55,7 +72,7 @@ export default defineComponent({
     },
   },
 
-  emits: ['summarySelected', 'tagClicked'],
+  emits: ['summarySelected', 'tagClicked', 'trashClicked'],
 
   setup(props, { emit }) {
     const snippetSummaries = ref([])
@@ -73,6 +90,7 @@ export default defineComponent({
             snippet: i,
             tags: i.tags,
             timeAgo: dayjs.utc(i.updated).fromNow(),
+            isHovering: false,
           }
         })
       } else {
@@ -91,6 +109,7 @@ export default defineComponent({
             snippet: i,
             tags: i.tags,
             timeAgo: dayjs.utc(i.updated).fromNow(),
+            isHovering: false,
           }
         })
       }
@@ -113,10 +132,34 @@ export default defineComponent({
       emit('tagClicked', tag)
     }
 
+    const trashClicked = (evt, snp) => {
+      evt.stopPropagation();
+      const snippet = snp.snippet
+      const snippetId = snippet?.snippetId
+
+      const tags = snippet.tags.join()
+      const tags2 = tags ? tags + ',trash' : 'trash'
+
+      debugger
+      updateSnippet(
+        snippet.title ?? '',
+        snippet.body,
+        tags2,
+        props.notebookId,
+        props.userId,
+        snippetId
+      ).then((text) => {
+        console.log('Success', text);
+
+        emit('trashClicked')
+      });
+    }
+
     return {
       selectSummary,
       snippetSummaries,
       tagClicked,
+      trashClicked,
     };
   },
 });
@@ -199,7 +242,11 @@ table {
 .grip {
   display: flex;
   align-items: center;
+}
 
+.icon {
+  margin-left: 0.2em;
+  margin-right: 0.6em;
 }
 
 .snippets-view {

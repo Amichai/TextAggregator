@@ -23,8 +23,10 @@
         v-if="isSnippetSelected"
         :notebookId="notebookId"
         :snippet="selectedSnippet"
+        :userId="userId"
         @backClicked="backClicked"
         @snippetSubmitted="snippetSubmitted"
+        @snippetUpdated="snippetUpdated"
       />
       <SnippetsView 
         :isMobile="isMobile"
@@ -32,8 +34,10 @@
         :notebookId="notebookId"
         :snippets="snippets"
         :filterTags="filterTags"
+        :userId="userId"
         @summarySelected="summarySelected"
         @tagClicked="tagClicked"
+        @trashClicked="trashClicked"
       />
     </div>
   </div>
@@ -47,7 +51,7 @@ import LabelsView from './LabelsView.vue';
 import NewSnippetArea from './NewSnippetArea.vue';
 import SnippetsView from './SnippetsView.vue';
 import { getNotebook, newSnippet, getSnippet, updateSnippet } from './../helpers/apiHelper';
-import { removeElement } from "./../helpers/helpers";
+import { removeElement, parseTags } from "./../helpers/helpers";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'vue-router';
 import { useAuth0 } from '@auth0/auth0-vue';
@@ -90,14 +94,19 @@ export default defineComponent({
 
     const snippetSubmitted = (snippetId) => {
       getSnippet(props.notebookId, snippetId, userId).then((updatedSnippet) => {
-        updatedSnippet.tags = updatedSnippet.tags.split(',').map(i => i.toLowerCase())
-        selectedSnippet.value = updatedSnippet
-
-        const matchedSnippet = snippets.value.filter(i => i.snippetId === snippetId)[0]
-        matchedSnippet.title = updatedSnippet.title
-        matchedSnippet.body = updatedSnippet.body
-        matchedSnippet.tags = updatedSnippet.tags
+        snippetUpdated(updatedSnippet)
       })
+    }
+
+    const snippetUpdated = (updatedSnippet) => {
+      updatedSnippet.tags = parseTags(updatedSnippet.tags)
+      const snippetId = updatedSnippet.snippetId
+      selectedSnippet.value = updatedSnippet
+
+      const matchedSnippet = snippets.value.filter(i => i.snippetId === snippetId)[0]
+      matchedSnippet.title = updatedSnippet.title
+      matchedSnippet.body = updatedSnippet.body
+      matchedSnippet.tags = updatedSnippet.tags
     }
 
     const loadNotebook = () => {
@@ -112,7 +121,7 @@ export default defineComponent({
               return 
             }
 
-            snippet.tags = snippet.tags.split(',').map(i => i.toLowerCase());
+            snippet.tags = parseTags(snippet.tags)
           }
         );
 
@@ -165,6 +174,7 @@ export default defineComponent({
 
     const newPost = () => {
       const uuid = uuidv4().replaceAll('-', '');
+      // filterTags.value = []
 
       newSnippet(
         '',
@@ -187,6 +197,10 @@ export default defineComponent({
       isMobile.value = visualViewport.width <= MOBILE_WIDTH;
     }
 
+    const trashClicked = () => {
+      loadNotebook()
+    }
+
 
     return {
       snippets,
@@ -199,6 +213,9 @@ export default defineComponent({
       newPost,
       snippetSubmitted,
       isMobile,
+      userId,
+      trashClicked,
+      snippetUpdated,
     };
   },
 });

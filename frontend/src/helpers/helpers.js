@@ -8,3 +8,8 @@ export const removeElement = (arr, element) => {
 
   return arr
 }
+
+
+export const parseTags = (tagString) => {
+  return tagString.split(',').map(i => i.toLowerCase().trim()); 
+}

@@ -3,7 +3,6 @@
     class="new-snippet-area new-snippet-area-editing"
   >
     <div class="header">
-
       <div class="header-button">
         <i class="bi-arrow-left" @click="backClicked"></i>
       </div>
@@ -50,13 +49,14 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch, watchEffect, onBeforeUnmount } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
-import { updateSnippet, getSnippet } from './../helpers/apiHelper';
+import { updateSnippet, getSnippet, updateNotebook } from './../helpers/apiHelper';
 import { useAuth0 } from '@auth0/auth0-vue';
 import { useMagicKeys } from '@vueuse/core'
 import { useRouter } from "vue-router";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
+import { removeElement, parseTags } from "./../helpers/helpers";
 import contenteditable from 'vue-contenteditable';
 
 export default defineComponent({
@@ -74,9 +74,13 @@ export default defineComponent({
       type: Object,
       required: false,
     },
+    userId: {
+      type: String,
+      required: true,
+    },
   },
 
-  emits: ['tagClicked', 'snippetSubmitted', 'cancelChanges', 'backClicked'],
+  emits: ['tagClicked', 'snippetSubmitted', 'cancelChanges', 'backClicked', 'snippetUpdated'],
 
   setup(props, { emit }) {
     const { meta, enter } = useMagicKeys()
@@ -131,7 +135,7 @@ export default defineComponent({
       });
     };
 
-    var polling;
+    var isSavedPoll, querySnippetPoll;
 
     const timeAgo = ref('')
     const isChangeUnsaved = ref(false)
@@ -145,7 +149,7 @@ export default defineComponent({
         return true
       }
 
-      const snippetTags = snippet.tags
+      const snippetTags = snippet.tags.filter(i => i !== '')
 
       if(snippetTags.length != tags.value.length) {
         console.log("tag length changed")
@@ -165,7 +169,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      polling = setInterval(() => {
+      isSavedPoll = setInterval(() => {
         timeAgo.value = dayjs.utc(props.snippet.updated).fromNow()
 
         isChangeUnsaved.value = isSnippetModified(props.snippet)
@@ -173,12 +177,31 @@ export default defineComponent({
         if (isChangeUnsaved.value) {
           timeAgo.value = "*" + timeAgo.value
         }
+		  }, 400)
+
+      querySnippetPoll = setInterval(() => {
+        if(isChangeUnsaved.value) {
+          return
+        }
+        console.log("get snippet", dayjs().format())
+        getSnippet(
+          props.notebookId,
+          props.snippet.snippetId,
+          props.userId,
+        ).then((updatedSnippet) => {
+          emit('snippetUpdated', updatedSnippet)
+
+          title.value = updatedSnippet.title
+          body.value = updatedSnippet.body
+          tags.value = updatedSnippet.tags.filter(i => i !== '').map((i) => ({ text: i }))
+        })
         
-		}, 500)
+		  }, 10000)
     })
 
     onBeforeUnmount(() => {
-      clearInterval(polling)
+      clearInterval(isSavedPoll)
+      clearInterval(querySnippetPoll)
     })
 
     const tagClicked = (evt, tagText) => {

@@ -38,3 +38,9 @@ ACCB9D
    - preserve the tag filter when navigating between routes
 
  - I should be able to hit the back button to save my changes!
+
+
+  - handle new users
+  -------
+
+  
