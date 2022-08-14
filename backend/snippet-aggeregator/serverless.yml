@@ -20,10 +20,14 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - execute-api:Invoke
+            - execute-api:ManageConnections
           Resource:
             - arn:aws:dynamodb:us-east-1:276830396462:table/TA_Snippets
             - arn:aws:dynamodb:us-east-1:276830396462:table/TA_Users
             - arn:aws:dynamodb:us-east-1:276830396462:table/TA_Notebooks
+            - arn:aws:dynamodb:us-east-1:276830396462:table/TA_ConnectedUsers
+            - arn:aws:execute-api:*:*:*
 
   environment:
     TA_Snippets: TA_Snippets
@@ -98,6 +102,25 @@ functions:
       - httpApi:
           path: /deleteSnippet
           method: DELETE
+
+  connectionHandler:
+    handler: handler.connectionHandler
+    events:
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+
+  defaultHandler:
+    handler: handler.defaultHandler
+    events:
+      - websocket: $default #simple event definition without extra route property
+  
+  sendMessageHandler:
+    handler: handler.sendMessageHandler
+    events:
+      - websocket:
+          route: sendMessage
 
 plugins:
   - serverless-python-requirements

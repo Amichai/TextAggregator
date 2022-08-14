@@ -17,6 +17,42 @@ def hello(event, context):
     return response
 
 
+client = boto3.client('apigatewaymanagementapi', endpoint_url="https://nj87v6wtpf.execute-api.us-east-1.amazonaws.com/production")
+
+def sendMessage(message):
+    dynamodb = boto3.resource('dynamodb')
+    connectedUsersTable = dynamodb.Table('TA_ConnectedUsers')
+
+    response = connectedUsersTable.scan()
+    data = response['Items']
+
+    while 'LastEvaluatedKey' in response:
+        response = connectedUsersTable.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+        data.extend(response['Items'])
+
+    dynamodb = None
+    connectedUsersTable = None
+
+    for connection in data:
+        connectionId = connection['connectionId']
+        print("Connection id: {}".format(connectionId))
+        try:
+            response = client.post_to_connection(ConnectionId=connectionId, Data=message)
+            print(response)
+        except Exception as e:
+            print(e)
+
+            if dynamodb == None or connectedUsersTable == None:
+                dynamodb = boto3.resource('dynamodb')
+                connectedUsersTable = dynamodb.Table('TA_ConnectedUsers')
+
+            print("Removing connection: {}".format(connectionId))
+            connectedUsersTable.delete_item(
+                Key={
+                    'connectionId': connectionId,
+                }
+            )
+
 def getNotebooks(event, context):
     print("Get Notebooks")
 
@@ -274,6 +310,18 @@ def updateSnippet(event, context):
         ':up': getTimeStr(),
     })
 
+    to_write = {
+        'notebookId': notebookId,
+        'userId-snippetId': '{}-{}'.format(userId, snippetId),
+        'userId': userId,
+        'snippetId': snippetId,
+        'updated': getTimeStr(),
+        'title': body['title'],
+        'body': body['body'],
+        'tags': body['tags'],
+    }
+
+    sendMessage(json.dumps(to_write))
 
     response = {"statusCode": 200, "body": json.dumps(update_result)}
 
@@ -313,6 +361,8 @@ def newSnippet(event, context):
         Item=to_write
     )
 
+    sendMessage(json.dumps(to_write))
+    
     response = {"statusCode": 200, "body": json.dumps(result)}
 
     return response
@@ -344,6 +394,58 @@ def deleteSnippet(event, context):
     return response
 
 
+def connectionHandler(event, context):
+    print(event)
+    print(context)
+        
+    connectionId = event["requestContext"]["connectionId"]
+    dynamodb = boto3.resource('dynamodb')
+    connectedUsersTable = dynamodb.Table('TA_ConnectedUsers')
+
+    to_write = {
+        'connectionId': connectionId,
+        'created': getTimeStr()
+    }
+    
+    to_write = json.loads(json.dumps(to_write), parse_float=Decimal)
+
+    print("to write: {}".format(to_write))
+
+    result = connectedUsersTable.put_item(
+        Item=to_write
+    )
+
+
+    return {"statusCode": 200}
+
+def defaultHandler(event, context):
+    print(event)
+    print(context)
+    connectionId = event["requestContext"]["connectionId"]
+    dynamodb = boto3.resource('dynamodb')
+    connectedUsersTable = dynamodb.Table('TA_ConnectedUsers')
+
+    connectedUsersTable.delete_item(
+        Key={
+            'connectionId': connectionId,
+        }
+    )
+    
+    return {"statusCode": 200}
+
+def sendMessageHandler(event, context):
+    print(event)
+    body = json.loads(event['body'])
+    message = body['message']
+    print("message")
+    print(message)
+
+    # check the password
+    # if the password is there, blast out the message to everyone
+    sendMessage(message)    
+
+    return { "statusCode": 200  }
+
 if __name__ == "__main__":
     notebookId = "1e47125270194237a3bc290e81a3980d"
     snippetId = "3399530578dd40f8ac3db7f8bd45bf1b"
@@ -371,4 +473,3 @@ if __name__ == "__main__":
 
 
 # user authentication
-#

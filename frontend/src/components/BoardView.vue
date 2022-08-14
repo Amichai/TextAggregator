@@ -84,6 +84,19 @@ export default defineComponent({
 
     const router = useRouter()
 
+    let socket = new WebSocket("wss://nj87v6wtpf.execute-api.us-east-1.amazonaws.com/production");
+
+    socket.onmessage = (event) => {
+      const updatedSnippet = JSON.parse(event.data)
+      console.log(event)
+
+      const matchedSnippet = snippets.value.filter(snippet => snippet.snippetId == updatedSnippet.snippetId)[0]
+
+      matchedSnippet.body = updatedSnippet.body
+      matchedSnippet.title = updatedSnippet.title
+      matchedSnippet.tags = updatedSnippet.tags ? parseTags(updatedSnippet.tags) : []
+    }
+
     onMounted(() => {
       window.addEventListener("resize", onResize);
     })
@@ -124,7 +137,6 @@ export default defineComponent({
             snippet.tags = parseTags(snippet.tags)
           }
         );
-
 
         const parts = window.location.href.split('#')
         if (parts.length > 1) {

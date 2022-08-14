@@ -117,7 +117,7 @@ export default defineComponent({
     
     watch(() => props.snippets, (newVal, oldVal) => {
       loadSnippets()
-    })
+    }, { deep: true })
     
     watch(() => props.filterTags, (newVal, oldVal) => {
       loadSnippets()
