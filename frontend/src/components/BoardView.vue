@@ -92,9 +92,13 @@ export default defineComponent({
 
       const matchedSnippet = snippets.value.filter(snippet => snippet.snippetId == updatedSnippet.snippetId)[0]
 
-      matchedSnippet.body = updatedSnippet.body
-      matchedSnippet.title = updatedSnippet.title
-      matchedSnippet.tags = updatedSnippet.tags ? parseTags(updatedSnippet.tags) : []
+      if(!matchedSnippet) {
+        loadNotebook()
+      } else {
+        matchedSnippet.body = updatedSnippet.body
+        matchedSnippet.title = updatedSnippet.title
+        matchedSnippet.tags = updatedSnippet.tags ? parseTags(updatedSnippet.tags) : []
+      }
     }
 
     onMounted(() => {
