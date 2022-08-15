@@ -11,8 +11,13 @@
       <td v-if="snippet.isHovering"
         class="time-ago"
         v-show="!isMobile"
+        v-tooltip="{
+          content: snippet.snippet.body,
+          theme: 'tooltip'
+        }"
       >
-        <i class="bi-grip-vertical icon"></i>
+        <i class="bi-grip-vertical icon"
+        ></i>
         <i class="bi-trash icon" 
           @click="(evt) => trashClicked(evt, snippet)"
         ></i>

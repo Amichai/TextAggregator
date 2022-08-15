@@ -19,6 +19,8 @@ import updateLocale from 'dayjs/plugin/updateLocale'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 
+import FloatingVue from 'floating-vue'
+
 dayjs.extend(updateLocale)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -42,9 +44,12 @@ dayjs.updateLocale('en', {
 })
 
 const app = createApp(App);
+app.use(FloatingVue)
+
 // Make sure to _use_ the router instance to make the
 // whole app router-aware.
 // app.use(contenteditable)
+
 app.use(router);
 app.use(vClickOutside);
 
