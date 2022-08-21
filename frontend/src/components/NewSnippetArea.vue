@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="new-snippet-area new-snippet-area-editing"
-    v-if="isSnippetLoaded"
-  >
+  <div class="new-snippet-area new-snippet-area-editing" v-if="isSnippetLoaded">
     <div class="header">
       <div class="header-button">
         <i class="bi-arrow-left" @click="backClicked"></i>
@@ -23,24 +20,27 @@
             v-model="title"
             @blur="submitSnippet"
           />
-          <contenteditable class="form-control text-area"
-          v-model="body"
-           tag="div" :contenteditable="true"
-          @blur="submitSnippet">
+          <contenteditable
+            class="form-control text-area"
+            v-model="body"
+            tag="div"
+            :contenteditable="true"
+            @blur="submitSnippet"
+          >
           </contenteditable>
         </div>
-        </div>
-        <div class="footer">
-          <VueTagsInput
-            class="vue-tags-input"
-            placeholder="Tags"
-            v-model="tag"
-            :tags="tags"
-            @tags-changed="(newTags) => (tags = newTags)"
-            @blur="submitSnippet"
-          />
+      </div>
+      <div class="footer">
+        <VueTagsInput
+          class="vue-tags-input"
+          placeholder="Tags"
+          v-model="tag"
+          :tags="tags"
+          @tags-changed="(newTags) => (tags = newTags)"
+          @blur="submitSnippet"
+        />
         <div class="time-ago">
-          {{timeAgo}}
+          {{ timeAgo }}
         </div>
       </div>
     </div>
@@ -48,16 +48,28 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch, watchEffect, onBeforeUnmount } from 'vue';
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  watch,
+  watchEffect,
+  onBeforeUnmount,
+} from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
-import { updateSnippet, getSnippet, updateNotebook } from './../helpers/apiHelper';
+import {
+  updateSnippet,
+  getSnippet,
+  updateNotebook,
+} from './../helpers/apiHelper';
 import { useAuth0 } from '@auth0/auth0-vue';
-import { useMagicKeys } from '@vueuse/core'
-import { useRouter } from "vue-router";
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import utc from 'dayjs/plugin/utc'
-import { removeElement, parseTags } from "./../helpers/helpers";
+import { useMagicKeys } from '@vueuse/core';
+import { useRouter } from 'vue-router';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import utc from 'dayjs/plugin/utc';
+import { removeElement, parseTags } from './../helpers/helpers';
 import contenteditable from 'vue-contenteditable';
 
 export default defineComponent({
@@ -81,55 +93,63 @@ export default defineComponent({
     },
   },
 
-  emits: ['tagClicked', 'snippetSubmitted', 'cancelChanges', 'backClicked', 'snippetUpdated'],
+  emits: [
+    'tagClicked',
+    'snippetSubmitted',
+    'cancelChanges',
+    'backClicked',
+    'snippetUpdated',
+  ],
 
   setup(props, { emit }) {
-    const { meta, enter } = useMagicKeys()
+    const { meta, enter } = useMagicKeys();
 
-    const initialSnippet = ref(null)
-    const isSnippetLoaded = ref(false)
-    const body = ref(null)
+    const initialSnippet = ref(null);
+    const isSnippetLoaded = ref(false);
+    const body = ref(null);
     const tag = ref('');
 
     const tags = ref(null);
 
     const title = ref(null);
 
-    getSnippet(props.notebookId, props.snippetId, props.userId)
-      .then((snippet) => {
-        initialSnippet.value = snippet
-        initialSnippet.value.tags = parseTags(snippet.tags)
-        body.value = snippet.body
-        title.value = snippet.title
-        tags.value = snippet.tags.filter(i => i !== '').map((i) => ({ text: i }))
-        isSnippetLoaded.value = true
-    })
+    getSnippet(props.notebookId, props.snippetId, props.userId).then(
+      (snippet) => {
+        initialSnippet.value = snippet;
+        initialSnippet.value.tags = parseTags(snippet.tags);
+        body.value = snippet.body;
+        title.value = snippet.title;
+        tags.value = snippet.tags
+          .filter((i) => i !== '')
+          .map((i) => ({ text: i }));
+        isSnippetLoaded.value = true;
+      }
+    );
 
     watchEffect(() => {
       if (meta.value && enter.value) {
-        submitSnippet()
+        submitSnippet();
       }
-    })
+    });
 
-    const router = useRouter()
+    const router = useRouter();
 
-    router.push(`/notebook/${props.notebookId}#${props.snippetId}`)
+    router.push(`/notebook/${props.notebookId}#${props.snippetId}`);
 
     const cancelChanges = () => {
       emit('cancelChanges', initialSnippet);
     };
 
     const submitSnippet = async () => {
-      if(!body.value && !title.value) {
-        return
+      if (!body.value && !title.value) {
+        return;
       }
 
-      if(!isSnippetModified(initialSnippet.value)) {
-        return
+      if (!isSnippetModified(initialSnippet.value)) {
+        return;
       }
 
-      const snippetId =
-        props.snippetId;
+      const snippetId = props.snippetId;
 
       updateSnippet(
         title.value ?? '',
@@ -137,91 +157,90 @@ export default defineComponent({
         tags.value.map((tag) => tag.text).join(),
         props.notebookId,
         props.userId,
-        snippetId,
+        snippetId
       ).then((text) => {
         console.log('Success', text);
         emit('snippetSubmitted', snippetId);
 
-        initialSnippet.value.title = title.value
-        initialSnippet.value.body = body.value
-        initialSnippet.value.tags = tags.value.map(i => i.text)
+        initialSnippet.value.title = title.value;
+        initialSnippet.value.body = body.value;
+        initialSnippet.value.tags = tags.value.map((i) => i.text);
       });
     };
 
     var isSavedPoll, querySnippetPoll;
 
-    const timeAgo = ref('')
-    const isChangeUnsaved = ref(false)
+    const timeAgo = ref('');
+    const isChangeUnsaved = ref(false);
 
     const isSnippetModified = (snippet) => {
-      var isModified = false
-      isModified = snippet.title !== title.value 
-          || snippet.body !== body.value
+      var isModified = false;
+      isModified = snippet.title !== title.value || snippet.body !== body.value;
 
-      if(isModified) {
-        console.log("is modified")
-        return true
+      if (isModified) {
+        console.log('is modified');
+        return true;
       }
 
-      const snippetTags = snippet.tags.filter(i => i !== '')
+      const snippetTags = snippet.tags.filter((i) => i !== '');
 
-      if(snippetTags.length != tags.value.length) {
-        console.log("tag length changed")
-        return true
+      if (snippetTags.length != tags.value.length) {
+        console.log('tag length changed');
+        return true;
       }
 
-      const tagTexts = tags.value.map(i => i.text)
+      const tagTexts = tags.value.map((i) => i.text);
 
-      if(!snippetTags.every((element) => {
-        return tagTexts.includes(element)
-      })) {
-        console.log("tag contents are different")
-        return true
+      if (
+        !snippetTags.every((element) => {
+          return tagTexts.includes(element);
+        })
+      ) {
+        console.log('tag contents are different');
+        return true;
       }
 
-      return false
-    }
+      return false;
+    };
 
     onMounted(() => {
       isSavedPoll = setInterval(() => {
-        timeAgo.value = dayjs.utc(initialSnippet.updated).fromNow()
+        timeAgo.value = dayjs.utc(initialSnippet.updated).fromNow();
 
-        isChangeUnsaved.value = isSnippetModified(initialSnippet.value)
+        isChangeUnsaved.value = isSnippetModified(initialSnippet.value);
 
         if (isChangeUnsaved.value) {
-          timeAgo.value = "*" + timeAgo.value
+          timeAgo.value = '*' + timeAgo.value;
         }
-		  }, 400)
+      }, 400);
 
       querySnippetPoll = setInterval(() => {
-        if(isChangeUnsaved.value) {
-          return
+        if (isChangeUnsaved.value) {
+          return;
         }
-        console.log("get snippet", dayjs().format())
-        getSnippet(
-          props.notebookId,
-          props.snippetId,
-          props.userId,
-        ).then((updatedSnippet) => {
-          emit('snippetUpdated', updatedSnippet)
+        console.log('get snippet', dayjs().format());
+        getSnippet(props.notebookId, props.snippetId, props.userId).then(
+          (updatedSnippet) => {
+            emit('snippetUpdated', updatedSnippet);
 
-          title.value = updatedSnippet.title
-          body.value = updatedSnippet.body
-          tags.value = updatedSnippet.tags.filter(i => i !== '').map((i) => ({ text: i }))
+            title.value = updatedSnippet.title;
+            body.value = updatedSnippet.body;
+            tags.value = updatedSnippet.tags
+              .filter((i) => i !== '')
+              .map((i) => ({ text: i }));
 
-
-          initialSnippet.value.title = title.value
-          initialSnippet.value.body = body.value
-          initialSnippet.value.tags = tags.value.map(i => i.text)
-        })
-        
-		  }, 10000)
-    })
+            initialSnippet.value.title = title.value;
+            initialSnippet.value.body = body.value;
+            initialSnippet.value.tags = tags.value.map((i) => i.text);
+          }
+        );
+      }, 10000);
+    });
 
     onBeforeUnmount(() => {
-      clearInterval(isSavedPoll)
-      clearInterval(querySnippetPoll)
-    })
+      clearInterval(isSavedPoll);
+      clearInterval(querySnippetPoll);
+    });
 
     const tagClicked = (evt, tagText) => {
       evt.stopPropagation();
@@ -229,13 +248,12 @@ export default defineComponent({
     };
 
     const backClicked = () => {
-      router.push(`/notebook/${props.notebookId}`)
-      emit('backClicked')
-    }
+      router.push(`/notebook/${props.notebookId}`);
+      emit('backClicked');
+    };
 
     const trashClicked = () => {
-      const snippetId =
-        props.snippetId
+      const snippetId = props.snippetId;
 
       updateSnippet(
         title.value ?? '',
@@ -246,9 +264,9 @@ export default defineComponent({
         snippetId
       ).then((text) => {
         console.log('Success', text);
-        backClicked()
+        backClicked();
       });
-    }
+    };
 
     return {
       body,
@@ -296,8 +314,8 @@ export default defineComponent({
   min-height: 60vh; */
 
   border-radius: 0;
-  
-  border:none;
+
+  border: none;
   overflow: auto;
 }
 
@@ -313,7 +331,7 @@ export default defineComponent({
   font-weight: bold;
   border-radius: 0;
   box-shadow: none;
-  border:none
+  border: none;
 }
 
 .header-button {
@@ -348,9 +366,8 @@ export default defineComponent({
 
 .footer {
   display: flex;
-  justify-content: space-between
+  justify-content: space-between;
 }
-
 
 .footer {
   display: flex;

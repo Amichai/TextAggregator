@@ -22,9 +22,7 @@
           </svg>
         </a>
 
-        <a @click="logout" class="link-primary">
-          Log Out
-        </a>
+        <a @click="logout" class="link-primary"> Log Out </a>
       </div>
     </div>
   </header>
@@ -38,11 +36,11 @@ export default defineComponent({
   setup() {
     const { loginWithRedirect, logout, user } = useAuth0();
 
-    console.log(user.value.sub)
+    console.log(user.value.sub);
 
     return {
       login: () => {
-       loginWithRedirect();
+        loginWithRedirect();
       },
       logout,
     };
@@ -54,5 +52,4 @@ export default defineComponent({
 .header {
   background-color: var(--theme-color2);
 }
-
 </style>

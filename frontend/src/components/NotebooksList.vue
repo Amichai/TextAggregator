@@ -33,7 +33,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const { user } = useAuth0();
-    const userId = user.value.sub
+    const userId = user.value.sub;
 
     const router = useRouter();
 

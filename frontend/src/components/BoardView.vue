@@ -1,84 +1,99 @@
 <template>
-<div class="root">
-  <PageNavbar />
-  <div 
-    :class="['board-view',
-    isMobile && 'full-width']"
-  >
-    <div class="labels" v-show="!isMobile">
-      <LabelsView 
-        :notebookId="notebookId"
-        :snippets="snippets"
-        :filterTags="filterTags"
-        @tagClicked="tagClicked"
-      />
-    </div>
-    <div 
-      class="snippets">
-      <div class="snippets-header"
-      v-if="!isSnippetSelected">
-        <button type="button" class="btn btn-default bi-pencil new-button"
-          @click="newPost"
-        > New</button>
-        <div>
-          <span @click="sortCreatedClicked" 
-            :class="[
-              'noselect',
-              'sort-icon',
-              selectedSortOption[0] === 'C' && 'icon-selected'
-            ]">
-            <i v-if='selectedSortOption === "CU"' class="bi bi-sort-up"></i>
-            <i v-else class="bi bi-sort-down"></i>
-            Created
-          </span>
-          <span @click="sortUpdatedClicked" 
-            :class="[
-              'noselect',
-              'sort-icon',
-              selectedSortOption[0] === 'U' && 'icon-selected'
-            ]">
-            <i v-if='selectedSortOption === "UU"' class="bi bi-sort-up"></i>
-            <i v-else class="bi bi-sort-down"></i>
-            Updated
-          </span>
-        </div>
+  <div class="root">
+    <PageNavbar />
+    <div :class="['board-view', isMobile && 'full-width']">
+      <div class="labels" v-show="!isMobile">
+        <LabelsView
+          :notebookId="notebookId"
+          :snippets="snippets"
+          :filterTags="filterTags"
+          @tagClicked="tagClicked"
+        />
       </div>
-      <NewSnippetArea
-        v-if="isSnippetSelected"
-        :notebookId="notebookId"
-        :snippetId="selectedSnippetId"
-        :userId="userId"
-        @backClicked="backClicked"
-        @snippetSubmitted="snippetSubmitted"
-        @snippetUpdated="snippetUpdated"
-      />
-      <SnippetsView 
-        :isMobile="isMobile"
-        v-show="!isSnippetSelected"
-        :notebookId="notebookId"
-        :snippets="snippets"
-        :filterTags="filterTags"
-        :userId="userId"
-        @summarySelected="summarySelected"
-        @tagClicked="tagClicked"
-        @trashClicked="trashClicked"
-      />
+      <div class="snippets">
+        <div class="snippets-header" v-if="!isSnippetSelected">
+          <button
+            type="button"
+            class="btn btn-default bi-pencil new-button"
+            @click="newPost"
+          >
+            New
+          </button>
+          <div>
+            <span
+              @click="sortCreatedClicked"
+              :class="[
+                'noselect',
+                'sort-icon',
+                selectedSortOption[0] === 'C' && 'icon-selected',
+              ]"
+            >
+              <i v-if="selectedSortOption === 'CU'" class="bi bi-sort-up"></i>
+              <i v-else class="bi bi-sort-down"></i>
+              Created
+            </span>
+            <span
+              @click="sortUpdatedClicked"
+              :class="[
+                'noselect',
+                'sort-icon',
+                selectedSortOption[0] === 'U' && 'icon-selected',
+              ]"
+            >
+              <i v-if="selectedSortOption === 'UU'" class="bi bi-sort-up"></i>
+              <i v-else class="bi bi-sort-down"></i>
+              Updated
+            </span>
+          </div>
+        </div>
+        <NewSnippetArea
+          v-if="isSnippetSelected"
+          :notebookId="notebookId"
+          :snippetId="selectedSnippetId"
+          :userId="userId"
+          @backClicked="backClicked"
+          @snippetSubmitted="snippetSubmitted"
+          @snippetUpdated="snippetUpdated"
+        />
+        <SnippetsView
+          :isMobile="isMobile"
+          v-show="!isSnippetSelected"
+          :notebookId="notebookId"
+          :snippets="snippets"
+          :filterTags="filterTags"
+          :userId="userId"
+          @summarySelected="summarySelected"
+          @tagClicked="tagClicked"
+          @trashClicked="trashClicked"
+        />
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, watch, onMounted, onUnmounted, ref } from 'vue';
+import {
+  defineComponent,
+  computed,
+  watch,
+  onMounted,
+  onUnmounted,
+  ref,
+} from 'vue';
 import PageNavbar from './PageNavbar.vue';
 import LabelsView from './LabelsView.vue';
 import NewSnippetArea from './NewSnippetArea.vue';
 import SnippetsView from './SnippetsView.vue';
-import { getNotebook, newSnippet, getSnippet, updateSnippet } from './../helpers/apiHelper';
-import { removeElement, parseTags } from "./../helpers/helpers";
+import {
+  getNotebook,
+  newSnippet,
+  getSnippet,
+  updateSnippet,
+} from './../helpers/apiHelper';
+import { removeElement, parseTags } from './../helpers/helpers';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'vue-router';
-import dayjs from 'dayjs'
+import dayjs from 'dayjs';
 import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
@@ -105,196 +120,192 @@ export default defineComponent({
 
     const filterTags = ref([]);
 
-    const sortOptions = ref([
-      'CU',
-      'CD',
-      'UU',
-      'UD',
-    ])
+    const sortOptions = ref(['CU', 'CD', 'UU', 'UD']);
 
-    const selectedSortOption = ref(sortOptions.value[0])
+    const selectedSortOption = ref(sortOptions.value[0]);
 
-    const selectedSnippetId = ref(null)
+    const selectedSnippetId = ref(null);
 
-    const router = useRouter()
+    const router = useRouter();
 
-    let socket = new WebSocket("wss://nj87v6wtpf.execute-api.us-east-1.amazonaws.com/production");
+    let socket = new WebSocket(
+      'wss://nj87v6wtpf.execute-api.us-east-1.amazonaws.com/production'
+    );
 
     socket.onmessage = (event) => {
-      const updatedSnippet = JSON.parse(event.data)
-      console.log(event)
+      const updatedSnippet = JSON.parse(event.data);
+      console.log(event);
 
-      const matchedSnippet = snippets.value.filter(snippet => snippet.snippetId == updatedSnippet.snippetId)[0]
+      const matchedSnippet = snippets.value.filter(
+        (snippet) => snippet.snippetId == updatedSnippet.snippetId
+      )[0];
 
-      if(!matchedSnippet) {
-        loadNotebook()
+      if (!matchedSnippet) {
+        loadNotebook();
       } else {
-        matchedSnippet.body = updatedSnippet.body
-        matchedSnippet.title = updatedSnippet.title
-        matchedSnippet.tags = updatedSnippet.tags ? parseTags(updatedSnippet.tags) : []
+        matchedSnippet.body = updatedSnippet.body;
+        matchedSnippet.title = updatedSnippet.title;
+        matchedSnippet.tags = updatedSnippet.tags
+          ? parseTags(updatedSnippet.tags)
+          : [];
       }
-    }
+    };
 
     onMounted(() => {
-      window.addEventListener("resize", onResize);
-    })
+      window.addEventListener('resize', onResize);
+    });
 
     onUnmounted(() => {
-      window.removeEventListener("resize", onResize);
-    })
+      window.removeEventListener('resize', onResize);
+    });
 
     const snippetSubmitted = (snippetId) => {
       getSnippet(props.notebookId, snippetId, userId).then((updatedSnippet) => {
-        snippetUpdated(updatedSnippet)
-      })
-    }
+        snippetUpdated(updatedSnippet);
+      });
+    };
 
     const snippetUpdated = (updatedSnippet) => {
-      updatedSnippet.tags = parseTags(updatedSnippet.tags)
-      const snippetId = updatedSnippet.snippetId
-      selectedSnippetId.value = snippetId
+      updatedSnippet.tags = parseTags(updatedSnippet.tags);
+      const snippetId = updatedSnippet.snippetId;
+      selectedSnippetId.value = snippetId;
 
-      const matchedSnippet = snippets.value.filter(i => i.snippetId === snippetId)[0]
-      matchedSnippet.title = updatedSnippet.title
-      matchedSnippet.body = updatedSnippet.body
-      matchedSnippet.tags = updatedSnippet.tags
-    }
+      const matchedSnippet = snippets.value.filter(
+        (i) => i.snippetId === snippetId
+      )[0];
+      matchedSnippet.title = updatedSnippet.title;
+      matchedSnippet.body = updatedSnippet.body;
+      matchedSnippet.tags = updatedSnippet.tags;
+    };
 
     const loadNotebook = () => {
       getNotebook(props.notebookId).then((json) => {
         notebookName.value = json.notebook.name;
         snippets.value = json.snippets;
 
-        snippets.value.forEach(
-          (snippet) => {
-            if(!snippet.tags) {
-              snippet.tags = [];
-              return 
-            }
-
-            snippet.tags = parseTags(snippet.tags)
+        snippets.value.forEach((snippet) => {
+          if (!snippet.tags) {
+            snippet.tags = [];
+            return;
           }
-        );
 
-        const parts = window.location.href.split('#')
+          snippet.tags = parseTags(snippet.tags);
+        });
+
+        const parts = window.location.href.split('#');
         if (parts.length > 1) {
-          const snippetId = parts[1]
-          console.log(snippetId)
-          selectedSnippetId.value = snippetId
+          const snippetId = parts[1];
+          console.log(snippetId);
+          selectedSnippetId.value = snippetId;
         }
 
-        sortSnippets()
+        sortSnippets();
       });
     };
 
     loadNotebook();
 
     const tagClicked = (tag) => {
-      if(filterTags.value.includes(tag)) {
-        filterTags.value = removeElement(filterTags.value, tag)
+      if (filterTags.value.includes(tag)) {
+        filterTags.value = removeElement(filterTags.value, tag);
       } else {
-        filterTags.value = filterTags.value.concat([tag])
-
+        filterTags.value = filterTags.value.concat([tag]);
       }
-        const path = window.location.pathname;
-        if(filterTags.value.length > 0) {
-          router.push({path, query: { categories: filterTags.value.join(",") }})
-        } else {
-          router.push({path, query: {}})
-        }
-    }
+      const path = window.location.pathname;
+      if (filterTags.value.length > 0) {
+        router.push({
+          path,
+          query: { categories: filterTags.value.join(',') },
+        });
+      } else {
+        router.push({ path, query: {} });
+      }
+    };
 
     const summarySelected = (snippet) => {
-      if(selectedSnippetId.value === snippet.snippetId) {
+      if (selectedSnippetId.value === snippet.snippetId) {
         selectedSnippetId.value = undefined;
-        return
+        return;
       }
 
-      selectedSnippetId.value = snippet.snippetId
-    }
+      selectedSnippetId.value = snippet.snippetId;
+    };
 
     const backClicked = () => {
-      selectedSnippetId.value = undefined
+      selectedSnippetId.value = undefined;
       loadNotebook();
-    }
+    };
 
-    const isSnippetSelected = computed(() => !!selectedSnippetId.value)
+    const isSnippetSelected = computed(() => !!selectedSnippetId.value);
 
     const { user } = useAuth0();
-    const userId = user.value.sub
+    const userId = user.value.sub;
 
     const newPost = () => {
       const uuid = uuidv4().replaceAll('-', '');
       // filterTags.value = []
 
-      newSnippet(
-        '',
-        '',
-        '',
-        props.notebookId,
-        userId,
-        uuid
-      ).then((text) => {
+      newSnippet('', '', '', props.notebookId, userId, uuid).then((text) => {
         loadNotebook();
 
-        router.push(`/notebook/${props.notebookId}#${uuid}`)
+        router.push(`/notebook/${props.notebookId}#${uuid}`);
       });
-    }
+    };
 
-    const MOBILE_WIDTH = 760
+    const MOBILE_WIDTH = 760;
 
-    const isMobile = ref(visualViewport.width <= MOBILE_WIDTH)
+    const isMobile = ref(visualViewport.width <= MOBILE_WIDTH);
     const onResize = () => {
       isMobile.value = visualViewport.width <= MOBILE_WIDTH;
-    }
+    };
 
     const trashClicked = () => {
-      loadNotebook()
-    }
+      loadNotebook();
+    };
 
     const sortSnippets = () => {
-      const sortOption = selectedSortOption.value
+      const sortOption = selectedSortOption.value;
       if (sortOption === 'CD') {
         snippets.value.sort((a, b) => {
-          return +dayjs.utc(a.created) - +dayjs.utc(b.created)
-        })
+          return +dayjs.utc(a.created) - +dayjs.utc(b.created);
+        });
       }
       if (sortOption === 'CU') {
         snippets.value.sort((a, b) => {
-          return +dayjs.utc(b.created) - +dayjs.utc(a.created)
-        })
+          return +dayjs.utc(b.created) - +dayjs.utc(a.created);
+        });
       }
       if (sortOption === 'UU') {
         snippets.value.sort((a, b) => {
-          return +dayjs.utc(b.updated) - +dayjs.utc(a.updated)
-        })
+          return +dayjs.utc(b.updated) - +dayjs.utc(a.updated);
+        });
       }
       if (sortOption === 'UD') {
         snippets.value.sort((a, b) => {
-          return +dayjs.utc(a.updated) - +dayjs.utc(b.updated)
-        })
+          return +dayjs.utc(a.updated) - +dayjs.utc(b.updated);
+        });
       }
-    }
+    };
 
     const sortCreatedClicked = () => {
-      if(selectedSortOption.value === 'CU') {
-        selectedSortOption.value = 'CD'
+      if (selectedSortOption.value === 'CU') {
+        selectedSortOption.value = 'CD';
       } else {
-        selectedSortOption.value = 'CU'
+        selectedSortOption.value = 'CU';
       }
 
-      sortSnippets()
-    }
+      sortSnippets();
+    };
 
     const sortUpdatedClicked = () => {
-      if(selectedSortOption.value === 'UU') {
-        selectedSortOption.value = 'UD'
+      if (selectedSortOption.value === 'UU') {
+        selectedSortOption.value = 'UD';
       } else {
-        selectedSortOption.value = 'UU'
+        selectedSortOption.value = 'UU';
       }
 
-      sortSnippets()
-    }
+      sortSnippets();
+    };
 
     return {
       snippets,
@@ -352,7 +363,7 @@ export default defineComponent({
 
 .snippets-header {
   display: flex;
-  flex-direction:row;
+  flex-direction: row;
   justify-content: space-between;
 }
 
@@ -379,11 +390,11 @@ export default defineComponent({
 
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 </style>

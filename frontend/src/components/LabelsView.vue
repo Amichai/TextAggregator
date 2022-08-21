@@ -1,24 +1,31 @@
 <template>
-<div>
-  <div class="tags-container">
-    <p
-      v-for="tag in allTags"
-      :key="tag"
-      @click="tagClicked(tag)"
-      :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
-    >
-      {{ tag }}
-    </p>
+  <div>
+    <div class="tags-container">
+      <p
+        v-for="tag in allTags"
+        :key="tag"
+        @click="tagClicked(tag)"
+        :class="['tag-p', filterTags.includes(tag) && 'filter-tag']"
+      >
+        {{ tag }}
+      </p>
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, watch, onMounted, onUnmounted, ref, PropType } from 'vue';
+import {
+  defineComponent,
+  computed,
+  watch,
+  onMounted,
+  onUnmounted,
+  ref,
+  PropType,
+} from 'vue';
 
 export default defineComponent({
-  components: {
-  },
+  components: {},
 
   props: {
     notebookId: {
@@ -41,26 +48,30 @@ export default defineComponent({
     console.log(`notebook id: ${props.notebookId}`);
     const allTags = ref([]);
 
-    watch(() => props.snippets, (newVal, oldVal) => {
-      const allTagsWithDuplicates = props.snippets
-      .filter(snippet => !snippet.tags.includes('trash'))
-      .reduce(
-        (previous, current) => {
-          return [...previous, ...current.tags];
-        },
-        ['trash']
-      );
+    watch(
+      () => props.snippets,
+      (newVal, oldVal) => {
+        const allTagsWithDuplicates = props.snippets
+          .filter((snippet) => !snippet.tags.includes('trash'))
+          .reduce(
+            (previous, current) => {
+              return [...previous, ...current.tags];
+            },
+            ['trash']
+          );
 
-      allTags.value = [...new Set(allTagsWithDuplicates.map(i => i.toLowerCase()))].filter((t) => t);
-      allTags.value = allTags.value.sort();
+        allTags.value = [
+          ...new Set(allTagsWithDuplicates.map((i) => i.toLowerCase())),
+        ].filter((t) => t);
+        allTags.value = allTags.value.sort();
 
-      console.log(allTags.value)
-    })
-    
+        console.log(allTags.value);
+      }
+    );
 
     const tagClicked = (tagText) => {
-      emit('tagClicked', tagText)
-    }
+      emit('tagClicked', tagText);
+    };
 
     return {
       allTags,

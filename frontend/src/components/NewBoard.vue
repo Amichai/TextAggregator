@@ -1,5 +1,5 @@
 <template>
-<div>testing testing</div>
+  <div>testing testing</div>
 </template>
 
 <script lang="ts">
@@ -10,8 +10,7 @@ import { useAuth0 } from '@auth0/auth0-vue';
 import { newSnippet } from './../helpers/apiHelper';
 
 export default defineComponent({
-  components: {
-  },
+  components: {},
 
   props: {
     notebookId: {
@@ -23,28 +22,18 @@ export default defineComponent({
   emits: [],
 
   setup(props, { emit }) {
-
     const uuid = uuidv4().replaceAll('-', '');
     const { user } = useAuth0();
-    const userId = user.value.sub
-    const router = useRouter()
+    const userId = user.value.sub;
+    const router = useRouter();
 
-    newSnippet(
-      '',
-      '',
-      '',
-      props.notebookId,
-      userId,
-      uuid
-    ).then((text) => {
-      router.push(`/notebook/${props.notebookId}#${uuid}`)
+    newSnippet('', '', '', props.notebookId, userId, uuid).then((text) => {
+      router.push(`/notebook/${props.notebookId}#${uuid}`);
     });
 
-    return {
-    };
+    return {};
   },
 });
 </script>
 
-<style>
-</style>
+<style></style>

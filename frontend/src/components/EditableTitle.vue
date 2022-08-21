@@ -7,9 +7,11 @@
     >
       {{ modelValueModified }}
     </h2> -->
-    <div v-if="!isEditingTitle"
+    <div
+      v-if="!isEditingTitle"
       class="notebook-name-header"
-      @click="isEditingTitle = true">
+      @click="isEditingTitle = true"
+    >
       <slot />
     </div>
     <div class="edit-title-wrapper" v-if="isEditingTitle">

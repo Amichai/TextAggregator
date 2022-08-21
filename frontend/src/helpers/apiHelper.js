@@ -82,7 +82,7 @@ export const updateSnippet = async (
   tags,
   notebookId,
   userId,
-  snippetId,
+  snippetId
 ) => {
   const post = {
     title,

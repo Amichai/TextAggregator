@@ -328,7 +328,6 @@ def updateSnippet(event, context):
     return response
 
 
-
 def newSnippet(event, context):
     print("NEW SNIPPET")
     print(event)
