@@ -15,10 +15,34 @@
     </div>
     <div 
       class="snippets">
-      <button type="button" class="btn btn-default bi-pencil new-button"
-        v-if="!isSnippetSelected"
-        @click="newPost"
-      > New</button>
+      <div class="snippets-header"
+      v-if="!isSnippetSelected">
+        <button type="button" class="btn btn-default bi-pencil new-button"
+          @click="newPost"
+        > New</button>
+        <div>
+          <span @click="sortCreatedClicked" 
+            :class="[
+              'noselect',
+              'sort-icon',
+              selectedSortOption[0] === 'C' && 'icon-selected'
+            ]">
+            <i v-if='selectedSortOption === "CU"' class="bi bi-sort-up"></i>
+            <i v-else class="bi bi-sort-down"></i>
+            Created
+          </span>
+          <span @click="sortUpdatedClicked" 
+            :class="[
+              'noselect',
+              'sort-icon',
+              selectedSortOption[0] === 'U' && 'icon-selected'
+            ]">
+            <i v-if='selectedSortOption === "UU"' class="bi bi-sort-up"></i>
+            <i v-else class="bi bi-sort-down"></i>
+            Updated
+          </span>
+        </div>
+      </div>
       <NewSnippetArea
         v-if="isSnippetSelected"
         :notebookId="notebookId"
@@ -54,6 +78,7 @@ import { getNotebook, newSnippet, getSnippet, updateSnippet } from './../helpers
 import { removeElement, parseTags } from "./../helpers/helpers";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'vue-router';
+import dayjs from 'dayjs'
 import { useAuth0 } from '@auth0/auth0-vue';
 
 export default defineComponent({
@@ -79,6 +104,15 @@ export default defineComponent({
     const snippets = ref([]);
 
     const filterTags = ref([]);
+
+    const sortOptions = ref([
+      'CU',
+      'CD',
+      'UU',
+      'UD',
+    ])
+
+    const selectedSortOption = ref(sortOptions.value[0])
 
     const selectedSnippetId = ref(null)
 
@@ -148,6 +182,8 @@ export default defineComponent({
           console.log(snippetId)
           selectedSnippetId.value = snippetId
         }
+
+        sortSnippets()
       });
     };
 
@@ -216,6 +252,49 @@ export default defineComponent({
       loadNotebook()
     }
 
+    const sortSnippets = () => {
+      const sortOption = selectedSortOption.value
+      if (sortOption === 'CD') {
+        snippets.value.sort((a, b) => {
+          return +dayjs.utc(a.created) - +dayjs.utc(b.created)
+        })
+      }
+      if (sortOption === 'CU') {
+        snippets.value.sort((a, b) => {
+          return +dayjs.utc(b.created) - +dayjs.utc(a.created)
+        })
+      }
+      if (sortOption === 'UU') {
+        snippets.value.sort((a, b) => {
+          return +dayjs.utc(b.updated) - +dayjs.utc(a.updated)
+        })
+      }
+      if (sortOption === 'UD') {
+        snippets.value.sort((a, b) => {
+          return +dayjs.utc(a.updated) - +dayjs.utc(b.updated)
+        })
+      }
+    }
+
+    const sortCreatedClicked = () => {
+      if(selectedSortOption.value === 'CU') {
+        selectedSortOption.value = 'CD'
+      } else {
+        selectedSortOption.value = 'CU'
+      }
+
+      sortSnippets()
+    }
+
+    const sortUpdatedClicked = () => {
+      if(selectedSortOption.value === 'UU') {
+        selectedSortOption.value = 'UD'
+      } else {
+        selectedSortOption.value = 'UU'
+      }
+
+      sortSnippets()
+    }
 
     return {
       snippets,
@@ -231,6 +310,11 @@ export default defineComponent({
       userId,
       trashClicked,
       snippetUpdated,
+      sortOptions,
+      selectedSortOption,
+
+      sortCreatedClicked,
+      sortUpdatedClicked,
     };
   },
 });
@@ -257,8 +341,8 @@ export default defineComponent({
 }
 
 .new-button {
-  margin: 0 5% 0 5%;
-  padding: 10px;
+  margin: 0 5px 0 5px;
+  padding: 8px;
   width: 10em;
   background-color: var(--theme-color2);
   margin-bottom: 1em;
@@ -266,6 +350,40 @@ export default defineComponent({
   /* border:none; */
 }
 
+.snippets-header {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+}
+
 .snippets {
+}
+
+.sort-icon {
+  padding: 9px 15px 9px 15px;
+  margin: 0 8px 0 8px;
+  border-radius: 1.1em;
+  color: gray;
+  border-color: lightgray;
+  border-style: solid;
+}
+
+.icon-selected {
+  color: black;
+}
+
+.sort-icon:hover {
+  background-color: lightgray;
+  cursor: pointer;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
 </style>
