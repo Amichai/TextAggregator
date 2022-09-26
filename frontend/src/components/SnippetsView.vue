@@ -18,10 +18,19 @@
             theme: 'tooltip',
           }"
         >
-          <i class="bi-grip-vertical icon"></i>
           <i
             class="bi-trash icon"
             @click="(evt) => trashClicked(evt, snippet)"
+          ></i>
+          <i
+            class="bi-star icon"
+            v-show="!snippet.isStarred"
+            @click="(evt) => starClicked(evt, snippet, true)"
+          ></i>
+          <i
+            class="bi-star-fill icon"
+            v-show="snippet.isStarred"
+            @click="(evt) => starClicked(evt, snippet, false)"
           ></i>
         </td>
         <td v-if="!snippet.isHovering" class="time-ago" v-show="!isMobile">
@@ -97,6 +106,7 @@ export default defineComponent({
           .map((i) => {
             const title = i.title.trim();
             const body = i.body.trim();
+            const isStarred = i.isStarred;
             const bodySingleLine = body.replaceAll('\n', ' ');
             return {
               summary: `<b>${title}</b> <span style="font-size:14px">${bodySingleLine}</span>`,
@@ -104,6 +114,7 @@ export default defineComponent({
               tags: i.tags,
               timeAgo: dayjs.utc(i.updated).fromNow(),
               isHovering: false,
+              isStarred,
             };
           });
       } else {
@@ -116,6 +127,7 @@ export default defineComponent({
           .map((i) => {
             const title = i.title.trim();
             const body = i.body.trim();
+            const isStarred = i.isStarred;
             const bodySingleLine = body.replaceAll('\n', ' ');
             return {
               // summary: `<b>${title}</b> ${bodySingleLine}`,
@@ -124,6 +136,7 @@ export default defineComponent({
               tags: i.tags,
               timeAgo: dayjs.utc(i.updated).fromNow(),
               isHovering: false,
+              isStarred,
             };
           });
       }
@@ -162,7 +175,6 @@ export default defineComponent({
       const tags = snippet.tags.join();
       const tags2 = tags ? tags + ',trash' : 'trash';
 
-      debugger;
       updateSnippet(
         snippet.title ?? '',
         snippet.body,
@@ -177,11 +189,38 @@ export default defineComponent({
       });
     };
 
+    const starClicked = (evt, snp, isStarred) => {
+      evt.stopPropagation();
+      const snippet = snp.snippet;
+      const snippetId = snippet?.snippetId;
+
+      const tags = snippet.tags.join();
+
+      snp.snippet.isStarred = true
+
+      updateSnippet(
+        snippet.title ?? '',
+        snippet.body,
+        tags,
+        props.notebookId,
+        props.userId,
+        snippetId,
+        isStarred,
+      ).then((text) => {
+        console.log('Success', text);
+
+        // emit('starClicked');
+        emit('trashClicked');
+      });
+
+    }
+
     return {
       selectSummary,
       snippetSummaries,
       tagClicked,
       trashClicked,
+      starClicked,
     };
   },
 });

@@ -82,7 +82,8 @@ export const updateSnippet = async (
   tags,
   notebookId,
   userId,
-  snippetId
+  snippetId,
+  isStarred,
 ) => {
   const post = {
     title,
@@ -91,6 +92,7 @@ export const updateSnippet = async (
     notebookId,
     userId,
     snippetId,
+    isStarred,
   };
 
   const raw = JSON.stringify(post);

@@ -14,12 +14,15 @@
         <div class="snippets-header" v-if="!isSnippetSelected">
           <button
             type="button"
-            class="btn btn-default bi-pencil new-button"
+            :class="[
+              'btn', 'btn-default', 'bi-pencil', 'new-button',
+              isMobile && 'mobile-button'
+            ]"
             @click="newPost"
           >
             New
           </button>
-          <div>
+          <div class="updated-created-buttons">
             <span
               @click="sortCreatedClicked"
               :class="[
@@ -145,6 +148,7 @@ export default defineComponent({
       } else {
         matchedSnippet.body = updatedSnippet.body;
         matchedSnippet.title = updatedSnippet.title;
+        matchedSnippet.isStarred = updatedSnippet.isStarred ?? false
         matchedSnippet.tags = updatedSnippet.tags
           ? parseTags(updatedSnippet.tags)
           : [];
@@ -176,6 +180,7 @@ export default defineComponent({
       matchedSnippet.title = updatedSnippet.title;
       matchedSnippet.body = updatedSnippet.body;
       matchedSnippet.tags = updatedSnippet.tags;
+      matchedSnippet.isStarred = updatedSnippet.isStarred ?? false
     };
 
     const loadNotebook = () => {
@@ -386,6 +391,15 @@ export default defineComponent({
 .sort-icon:hover {
   background-color: lightgray;
   cursor: pointer;
+}
+
+.mobile-button {
+  width: 5em;
+}
+
+.updated-created-buttons {
+  display: flex;
+  align-items: baseline;
 }
 
 .noselect {

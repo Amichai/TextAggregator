@@ -297,17 +297,24 @@ def updateSnippet(event, context):
     userId = body['userId']
     snippetId = body['snippetId']
     
+    isStarred = False
+    if 'isStarred' in body:
+        isStarred = body['isStarred']
+
+    print("IS STARRED VALUE: {}".format(isStarred))
+    print("body: {}".format(body))
 
     update_result = table.update_item(
         Key={
             'notebookId': notebookId,
             'userId-snippetId': '{}-{}'.format(userId, snippetId)},
-        UpdateExpression="set body = :b, title = :tt, tags = :tg, updated = :up",
+        UpdateExpression="set body = :b, title = :tt, tags = :tg, updated = :up, isStarred = :st",
          ExpressionAttributeValues={
         ':b': body['body'],
         ':tt': body['title'],
         ':tg': body['tags'],
         ':up': getTimeStr(),
+        ':st': isStarred,
     })
 
     to_write = {
@@ -319,6 +326,7 @@ def updateSnippet(event, context):
         'title': body['title'],
         'body': body['body'],
         'tags': body['tags'],
+        'isStarred': isStarred,
     }
 
     sendMessage(json.dumps(to_write))
@@ -349,6 +357,7 @@ def newSnippet(event, context):
         'snippetId': snippetId,
         'created': timestamp,
         'updated': timestamp,
+        'isStarred': False,
         'title': body['title'],
         'body': body['body'],
         'tags': body['tags'],

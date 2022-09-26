@@ -8,6 +8,9 @@
       <div class="header-button" @click="trashClicked">
         <i class="bi-trash"></i>
       </div>
+      <!-- <div class="header-button" @click="highlightClicked">
+        <i class="bi-magic"></i>
+      </div> -->
     </div>
     <div>
       <div style="border-style: solid; border-width: 1px; border-color: gray">
@@ -175,7 +178,7 @@ export default defineComponent({
 
     const isSnippetModified = (snippet) => {
       var isModified = false;
-      isModified = snippet.title !== title.value || snippet.body !== body.value;
+      isModified = snippet?.title !== title.value || snippet.body !== body.value;
 
       if (isModified) {
         console.log('is modified');
