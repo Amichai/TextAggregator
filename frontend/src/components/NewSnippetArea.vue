@@ -24,6 +24,7 @@
             @blur="submitSnippet"
           />
           <contenteditable
+            id="bodyRef"
             class="form-control text-area"
             v-model="body"
             tag="div"
@@ -32,6 +33,19 @@
           >
           </contenteditable>
         </div>
+      </div>
+      <div class="new-line-area">
+        <input
+            class="form-control new-line"
+            type="text"
+            v-model="newLine"
+            @keydown.enter="submitNewLine"
+            v-focus
+          />
+      <div class="new-line-button" @click="submitNewLine">
+        <i class="bi-caret-right-square"></i>
+      </div>
+
       </div>
       <div class="footer">
         <VueTagsInput
@@ -59,6 +73,7 @@ import {
   watch,
   watchEffect,
   onBeforeUnmount,
+  nextTick,
 } from 'vue';
 import VueTagsInput from '@sipec/vue3-tags-input';
 import {
@@ -115,6 +130,7 @@ export default defineComponent({
     const tags = ref(null);
 
     const title = ref(null);
+    const newLine = ref(null);
 
     getSnippet(props.notebookId, props.snippetId, props.userId).then(
       (snippet) => {
@@ -271,6 +287,32 @@ export default defineComponent({
       });
     };
 
+    const setEndOfContenteditable = (contentEditableElement) => {
+        var range,selection;
+        range = document.createRange();//Create a range (a range is a like the selection but invisible)
+        range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
+        range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+        selection = window.getSelection();//get the selection object (allows you to change selection)
+        selection.removeAllRanges();//remove any selections already made
+        selection.addRange(range);//make the range you have just created the visible selection
+    }
+
+    const submitNewLine = async () => {
+      console.log(newLine.value)
+
+      body.value += `\n${newLine.value}`
+
+      await nextTick()
+
+      newLine.value = ''
+
+      var bodyRef = document.getElementById('bodyRef');
+
+      setEndOfContenteditable(bodyRef)
+
+      submitSnippet()
+    }
+
     return {
       body,
       tag,
@@ -284,6 +326,9 @@ export default defineComponent({
       trashClicked,
       timeAgo,
       isSnippetLoaded,
+
+      newLine,
+      submitNewLine,
     };
   },
 });
@@ -337,6 +382,12 @@ export default defineComponent({
   border: none;
 }
 
+.snippet-title {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
 .header-button {
   width: 3em;
   height: 2.5em;
@@ -344,6 +395,16 @@ export default defineComponent({
   display: flex;
   justify-content: space-around;
   align-items: center;
+}
+
+.new-line-button {
+  border-radius: 2em;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 3em;
+  height: 2.5em;
+  background: var(--theme-color1);
 }
 
 .header-button :hover {
@@ -398,5 +459,9 @@ export default defineComponent({
 
 a {
   margin-right: 1em;
+}
+
+.new-line-area {
+  display: flex;
 }
 </style>

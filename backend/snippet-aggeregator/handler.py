@@ -101,6 +101,24 @@ def getNotebook(event, context):
     queryStringParameters = event['queryStringParameters']
     print(queryStringParameters)
 
+    start = 0
+    take = 50
+
+    queryTags = []
+    if "tags" in queryStringParameters:
+        queryTags = queryStringParameters["tags"].split(',')
+        queryTags = [tag for tag in queryTags if tag != '']
+
+    if "start" in queryStringParameters:
+        start = int(queryStringParameters["start"])
+
+    if "take" in queryStringParameters:
+        take = int(queryStringParameters["take"])
+
+    sort = "created-desc"
+    if "sort" in queryStringParameters:
+        sort = queryStringParameters["sort"]
+
     notebookId = queryStringParameters['notebookId']
     dynamodb = boto3.resource('dynamodb')
     snippetsTable = dynamodb.Table('TA_Snippets')
@@ -108,7 +126,44 @@ def getNotebook(event, context):
     response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))
     items = response['Items']
 
-    snippets = sorted(items, key=lambda a: a['created'], reverse=True)
+    while 'LastEvaluatedKey' in response:
+        response = snippetsTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId), ExclusiveStartKey=response['LastEvaluatedKey'])
+
+        items.extend(response['Items'])
+
+    print("Item count: {}, query tags: {}".format(len(items), queryTags))
+
+    if len(queryTags) > 0:
+        filtered_items = []
+        for item in items:
+            item_tags = item['tags'].split(',')
+            tag_match = False
+            for tag in queryTags:
+                if tag in item_tags:
+                    tag_match = True
+                    break
+            if tag_match:
+                filtered_items.append(item)
+
+        items = filtered_items
+    else:
+        items = [item for item in items if not "trash" in item['tags'].split(',')]
+
+    print("Item count: {}".format(len(items)))
+
+    if sort == "created-desc":
+        snippets = sorted(items, key=lambda a: a['created'], reverse=True)
+    elif sort == "created-asc":
+        snippets = sorted(items, key=lambda a: a['created'], reverse=False)
+    elif sort == "edited-desc":
+        snippets = sorted(items, key=lambda a: a['updated'], reverse=True)
+    elif sort == "edited-asc":
+        snippets = sorted(items, key=lambda a: a['updated'], reverse=False)
+    else:
+        print("WARNING: UNRECOGNIZED SORT OPTION: {}".format(sort))
+        snippets = sorted(items, key=lambda a: a['created'], reverse=True)
+
+    snippets = snippets[start:start + take]
 
     notebooksTable = dynamodb.Table('TA_Notebooks')
     response = notebooksTable.query(KeyConditionExpression=Key('notebookId').eq(notebookId))

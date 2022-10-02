@@ -11,3 +11,7 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 # Prettier
 
 `npx prettier --write .`
+
+# Deploy:
+
+`yarn deploy`

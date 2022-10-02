@@ -20,9 +20,13 @@ export const getNotebookInfo = async (notebookId) => {
   return asJson;
 };
 
-export const getNotebook = async (notebookId) => {
+export const getNotebook = async (notebookId, start, take, sort, tags) => {
+
+  const startSuffix = start ? `&start=${start}` : ''
+  const takeSuffix = take ? `&take=${take}` : ''
+  const sortSuffix = sort ? `&sort=${sort}` : ''
   const response = await fetch(
-    `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${notebookId}`
+    `https://8cem0l4r4j.execute-api.us-east-1.amazonaws.com/getNotebook?notebookId=${notebookId}${startSuffix}${takeSuffix}${sortSuffix}&tags=${tags ?? ''}`
   );
 
   const asJson = await response.json();

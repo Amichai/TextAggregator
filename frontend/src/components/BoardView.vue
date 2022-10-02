@@ -9,6 +9,16 @@
           :filterTags="filterTags"
           @tagClicked="tagClicked"
         />
+        <!-- <button
+            type="button"
+            :class="[
+              'btn', 'btn-default', 'bi-trash', 'trash-button',
+              isMobile && 'mobile-button'
+            ]"
+            @click="trashLabel"
+          >
+            Trash
+          </button> -->
       </div>
       <div class="snippets">
         <div class="snippets-header" v-if="!isSnippetSelected">
@@ -58,17 +68,37 @@
           @snippetSubmitted="snippetSubmitted"
           @snippetUpdated="snippetUpdated"
         />
+          <!-- :filterTags="filterTags" -->
         <SnippetsView
           :isMobile="isMobile"
           v-show="!isSnippetSelected"
           :notebookId="notebookId"
           :snippets="snippets"
-          :filterTags="filterTags"
           :userId="userId"
+          :filterTags="[]"
           @summarySelected="summarySelected"
           @tagClicked="tagClicked"
           @trashClicked="trashClicked"
         />
+        <div 
+          class="footer"
+          v-if="!isSnippetSelected"
+        >
+          <button
+              type="button"
+              :class="[
+                'btn', 'btn-default', 'more-button', 'bi-arrow-down-short',
+                isMobile && 'mobile-button'
+              ]"
+              @click="loadMore"
+            >
+              Load More
+            </button>
+
+            <div class="snippets-loaded">
+            {{snippetCount}} snippets
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -122,6 +152,7 @@ export default defineComponent({
     const snippets = ref([]);
 
     const filterTags = ref([]);
+    const snippetCount = ref(0)
 
     const sortOptions = ref(['CU', 'CD', 'UU', 'UD']);
 
@@ -183,10 +214,14 @@ export default defineComponent({
       matchedSnippet.isStarred = updatedSnippet.isStarred ?? false
     };
 
-    const loadNotebook = () => {
-      getNotebook(props.notebookId).then((json) => {
+    const loadNotebook = (startIdx, takeCount, tags) => {
+      if(!startIdx || !takeCount) {
+        resetPagination()
+      }
+
+      getNotebook(props.notebookId, startIdx, takeCount, 'created-desc', tags).then((json) => {
         notebookName.value = json.notebook.name;
-        snippets.value = json.snippets;
+        snippets.value = [...snippets.value, ...json.snippets];
 
         snippets.value.forEach((snippet) => {
           if (!snippet.tags) {
@@ -194,7 +229,9 @@ export default defineComponent({
             return;
           }
 
-          snippet.tags = parseTags(snippet.tags);
+          if (typeof snippet.tags == 'string') {
+            snippet.tags = parseTags(snippet.tags);
+          }
         });
 
         const parts = window.location.href.split('#');
@@ -204,11 +241,25 @@ export default defineComponent({
           selectedSnippetId.value = snippetId;
         }
 
+        snippetCount.value = snippets.value.length
         sortSnippets();
       });
     };
 
-    loadNotebook();
+    let startIdx = 0
+    let takeCount = 30
+    const resetPagination = () => {
+      startIdx = 0
+      takeCount = 30
+      snippets.value = []
+    }
+
+    loadNotebook(startIdx, takeCount);
+
+    const loadMore = () => {
+      startIdx += takeCount
+      loadNotebook(startIdx, takeCount);
+    }
 
     const tagClicked = (tag) => {
       if (filterTags.value.includes(tag)) {
@@ -225,6 +276,9 @@ export default defineComponent({
       } else {
         router.push({ path, query: {} });
       }
+
+      resetPagination();
+      loadNotebook(startIdx, takeCount, filterTags.value.join())
     };
 
     const summarySelected = (snippet) => {
@@ -328,9 +382,12 @@ export default defineComponent({
       snippetUpdated,
       sortOptions,
       selectedSortOption,
+      loadMore,
 
       sortCreatedClicked,
       sortUpdatedClicked,
+
+      snippetCount,
     };
   },
 });
@@ -362,14 +419,32 @@ export default defineComponent({
   width: 10em;
   background-color: var(--theme-color2);
   margin-bottom: 1em;
-  /* color:black; */
-  /* border:none; */
+}
+
+.more-button {
+  margin: 0 5px 0 5px;
+  padding: 3px;
+  width: 7em;
+  background-color: var(--theme-color3);
+  color: white;
+  margin-bottom: 1em;
+}
+
+.footer {
+  display: flex;
+  margin: 1 0px;
 }
 
 .snippets-header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.snippets-loaded {
+  font-size: small;
+  margin-left: 20px;
+  font-style: italic;
 }
 
 .snippets {
@@ -384,6 +459,12 @@ export default defineComponent({
   border-style: solid;
 }
 
+.trash-button {
+  width: 6em;
+  background-color: var(--theme-color1);
+  margin-left: 5px;
+}
+
 .icon-selected {
   color: black;
 }
@@ -394,7 +475,7 @@ export default defineComponent({
 }
 
 .mobile-button {
-  width: 5em;
+  width: 7em;
 }
 
 .updated-created-buttons {

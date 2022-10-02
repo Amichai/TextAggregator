@@ -67,6 +67,8 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { updateNotebook, updateSnippet } from './../helpers/apiHelper';
 import utc from 'dayjs/plugin/utc';
+import LongPress from 'vue-directive-long-press'
+
 
 export default defineComponent({
   components: {},
