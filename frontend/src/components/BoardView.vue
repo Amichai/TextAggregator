@@ -1,5 +1,6 @@
 <template>
   <div class="root">
+    <BoardHeader />
     <PageNavbar />
     <div :class="['board-view', isMobile && 'full-width']">
       <div class="labels" v-show="!isMobile">
@@ -116,6 +117,7 @@ import PageNavbar from './PageNavbar.vue';
 import LabelsView from './LabelsView.vue';
 import NewSnippetArea from './NewSnippetArea.vue';
 import SnippetsView from './SnippetsView.vue';
+import BoardHeader from './BoardHeader.vue';
 import {
   getNotebook,
   newSnippet,
@@ -134,6 +136,7 @@ export default defineComponent({
     LabelsView,
     SnippetsView,
     NewSnippetArea,
+    BoardHeader,
   },
 
   props: {
