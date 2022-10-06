@@ -43,4 +43,8 @@ ACCB9D
   - handle new users
   -------
 
-  What's app, messanger model!!
+  Create new account workflow
+
+
+  - trash view
+   - archive

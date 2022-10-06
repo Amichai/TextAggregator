@@ -68,14 +68,13 @@
           @snippetSubmitted="snippetSubmitted"
           @snippetUpdated="snippetUpdated"
         />
-          <!-- :filterTags="filterTags" -->
         <SnippetsView
           :isMobile="isMobile"
           v-show="!isSnippetSelected"
           :notebookId="notebookId"
           :snippets="snippets"
           :userId="userId"
-          :filterTags="[]"
+          :filterTags="filterTags"
           @summarySelected="summarySelected"
           @tagClicked="tagClicked"
           @trashClicked="trashClicked"
