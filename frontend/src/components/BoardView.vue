@@ -1,7 +1,9 @@
 <template>
   <div class="root">
-    <BoardHeader />
-    <PageNavbar />
+    <BoardHeader
+      @newPost="newPost"
+      @sortChanged="sortChanged"
+     />
     <div :class="['board-view', isMobile && 'full-width']">
       <div class="labels" v-show="!isMobile">
         <LabelsView
@@ -22,44 +24,6 @@
           </button> -->
       </div>
       <div class="snippets">
-        <div class="snippets-header" v-if="!isSnippetSelected">
-          <button
-            type="button"
-            :class="[
-              'btn', 'btn-default', 'bi-pencil', 'new-button',
-              isMobile && 'mobile-button'
-            ]"
-            @click="newPost"
-          >
-            New
-          </button>
-          <div class="updated-created-buttons">
-            <span
-              @click="sortCreatedClicked"
-              :class="[
-                'noselect',
-                'sort-icon',
-                selectedSortOption[0] === 'C' && 'icon-selected',
-              ]"
-            >
-              <i v-if="selectedSortOption === 'CU'" class="bi bi-sort-up"></i>
-              <i v-else class="bi bi-sort-down"></i>
-              Created
-            </span>
-            <span
-              @click="sortUpdatedClicked"
-              :class="[
-                'noselect',
-                'sort-icon',
-                selectedSortOption[0] === 'U' && 'icon-selected',
-              ]"
-            >
-              <i v-if="selectedSortOption === 'UU'" class="bi bi-sort-up"></i>
-              <i v-else class="bi bi-sort-down"></i>
-              Updated
-            </span>
-          </div>
-        </div>
         <NewSnippetArea
           v-if="isSnippetSelected"
           :notebookId="notebookId"
@@ -126,7 +90,7 @@ import {
 } from './../helpers/apiHelper';
 import { removeElement, parseTags } from './../helpers/helpers';
 import { v4 as uuidv4 } from 'uuid';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import dayjs from 'dayjs';
 import { useAuth0 } from '@auth0/auth0-vue';
 
@@ -163,6 +127,8 @@ export default defineComponent({
     const selectedSnippetId = ref(null);
 
     const router = useRouter();
+    const route = useRoute();
+
 
     let socket = new WebSocket(
       'wss://nj87v6wtpf.execute-api.us-east-1.amazonaws.com/production'
@@ -324,6 +290,19 @@ export default defineComponent({
       loadNotebook();
     };
 
+
+    const sortChanged = () => {
+      if(!route.query['sort']) {
+        return
+      }
+
+      const sortOption = route.query['sort'];
+
+      selectedSortOption.value = sortOption as string
+      console.log(sortOption)
+      sortSnippets()
+    }
+
     const sortSnippets = () => {
       const sortOption = selectedSortOption.value;
       if (sortOption === 'CD') {
@@ -344,6 +323,16 @@ export default defineComponent({
       if (sortOption === 'UD') {
         snippets.value.sort((a, b) => {
           return +dayjs.utc(a.updated) - +dayjs.utc(b.updated);
+        });
+      }
+      if (sortOption === 'SU') {
+        snippets.value.sort((a, b) => {
+          return b.body.length - a.body.length;
+        });
+      }
+      if (sortOption === 'SD') {
+        snippets.value.sort((a, b) => {
+          return a.body.length - b.body.length;
         });
       }
     };
@@ -390,6 +379,8 @@ export default defineComponent({
       sortUpdatedClicked,
 
       snippetCount,
+
+      sortChanged,
     };
   },
 });
@@ -401,6 +392,7 @@ export default defineComponent({
 }
 
 .board-view {
+  margin-top: 5rem;
   display: grid;
   grid-template-columns: 10vw 88vw;
 }
@@ -415,14 +407,6 @@ export default defineComponent({
   flex-direction: column;
 }
 
-.new-button {
-  margin: 0 5px 0 5px;
-  padding: 8px;
-  width: 10em;
-  background-color: var(--theme-color2);
-  margin-bottom: 1em;
-}
-
 .more-button {
   margin: 0 5px 0 5px;
   padding: 3px;
@@ -435,12 +419,6 @@ export default defineComponent({
 .footer {
   display: flex;
   margin: 1 0px;
-}
-
-.snippets-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
 }
 
 .snippets-loaded {
@@ -478,11 +456,6 @@ export default defineComponent({
 
 .mobile-button {
   width: 7em;
-}
-
-.updated-created-buttons {
-  display: flex;
-  align-items: baseline;
 }
 
 .noselect {

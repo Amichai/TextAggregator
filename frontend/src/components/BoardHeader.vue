@@ -17,63 +17,37 @@
             >
             New
           </button>
-
           </li>
-          
         </ul>
-
-        <div class="updated-created-buttons">
-            <span
-              @click="sortCreatedClicked"
-              :class="[
-                'noselect',
-                'sort-icon',
-                selectedSortOption[0] === 'C' && 'icon-selected',
-              ]"
-            >
-              <i v-if="selectedSortOption === 'CU'" class="bi bi-sort-up"></i>
-              <i v-else class="bi bi-sort-down"></i>
-              Created
-            </span>
-            <span
-              @click="sortUpdatedClicked"
-              :class="[
-                'noselect',
-                'sort-icon',
-                selectedSortOption[0] === 'U' && 'icon-selected',
-              ]"
-            >
-              <i v-if="selectedSortOption === 'UU'" class="bi bi-sort-up"></i>
-              <i v-else class="bi bi-sort-down"></i>
-              Updated
-            </span>
-            <span
-              @click="sortUpdatedClicked"
-              :class="[
-                'noselect',
-                'sort-icon',
-                selectedSortOption[0] === 'U' && 'icon-selected',
-              ]"
-            >
-              <i v-if="selectedSortOption === 'UU'" class="bi bi-sort-up"></i>
-              <i v-else class="bi bi-sort-down"></i>
-              Size
-            </span>
-        </div>
 
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
           <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
         </form>
 
-        <div class="dropdown text-end">
-          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+        <div class="dropdown">
+          <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ selectedSortOption }}
           </a>
-          <ul class="dropdown-menu text-small">
-            <li><a
-              @click="logout"
-              class="dropdown-item" href="#">Sign out</a></li>
+
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" href="#"
+                @click="() => setSortOption('CU')"
+              >
+                Created</a></li>
+            <li><a class="dropdown-item" href="#"
+              @click="() => setSortOption('UU')">
+              Updated</a></li>
+            <li><a class="dropdown-item" href="#"
+            @click="() => setSortOption('SU')">
+              Size</a></li>
           </ul>
+        </div>
+
+        <div class="dropdown text-end">
+          <a
+              @click="logout"
+              class="dropdown-item" href="#">Sign out</a>
         </div>
       </div>
     </div>
@@ -83,6 +57,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useAuth0 } from '@auth0/auth0-vue';
+import { useRouter, useRoute } from 'vue-router';
 
 export default defineComponent({
   components: {
@@ -91,24 +66,53 @@ export default defineComponent({
   props: {
   },
 
-  emits: [],
+  emits: ['newPost', 'sortChanged'],
 
   setup(props, { emit }) {
     const { logout, user } = useAuth0();
     console.log(user.value.sub);
 
-    const sortOptions = ref(['CU', 'CD', 'UU', 'UD']);
-
-    const selectedSortOption = ref(sortOptions.value[0]);
-
+    const router = useRouter();
+    const route = useRoute();
     
+    const selectedSortOption = ref('Sort');
+    
+
+    const newPost = () => {
+      emit('newPost')
+    }
+
+    const sortOptionMapper = {
+      'CU': '↑ Created',
+      'CD': '↓ Created',
+      'UU': '↑ Updated',
+      'UD': '↓ Updated',
+      'SU': '↑ Size',
+      'SD': '↓ Size',
+    }
+
+    const setSortOption = (sortOption) => {
+      const path = route.path;
+      if (route.query['sort'] && route.query['sort'][1] == "U") {
+        sortOption = sortOption[0] + "D"
+      }
+
+      router.push({ path, query: { ...route.query, sort: sortOption } });
+
+      selectedSortOption.value = sortOptionMapper[sortOption];
+
+      emit('sortChanged')
+    }
 
     /// HOME, LOGOUT, SEARCH, SORT, NEW
     return {
       logout,
 
-      sortOptions,
       selectedSortOption,
+
+      setSortOption,
+
+      newPost,
     };
   },
 });
