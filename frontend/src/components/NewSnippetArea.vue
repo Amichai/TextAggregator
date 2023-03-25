@@ -23,15 +23,14 @@
             v-model="title"
             @blur="submitSnippet"
           />
-          <contenteditable
+          <TextEditor
             id="bodyRef"
             class="form-control text-area"
-            v-model="body"
-            tag="div"
-            :contenteditable="true"
+            :body="body"
             @blur="submitSnippet"
-          >
-          </contenteditable>
+           />
+            <!-- :contenteditable="true" -->
+            <!-- tag="div" -->
         </div>
       </div>
       <div class="new-line-area">
@@ -88,12 +87,13 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';
 import { removeElement, parseTags } from './../helpers/helpers';
-import contenteditable from 'vue-contenteditable';
+
+import TextEditor from './TextEditor.vue'
 
 export default defineComponent({
   components: {
     VueTagsInput,
-    contenteditable,
+    TextEditor,
   },
 
   props: {
@@ -351,20 +351,6 @@ export default defineComponent({
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-.text-area {
-  /* height: 10em; */
-  min-height: 10em;
-
-  /* height: 60vh;
-  max-height: 60vh;
-  min-height: 60vh; */
-
-  border-radius: 0;
-
-  border: none;
-  overflow: auto;
 }
 
 * :focus {

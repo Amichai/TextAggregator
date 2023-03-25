@@ -2,13 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 import notebooksList from '../components/NotebooksList.vue';
 import { authGuard } from '@auth0/auth0-vue';
 import BoardView from '../components/BoardView.vue';
+import ChatView from '../components/ChatView.vue';
 import NewBoard from '../components/NewBoard.vue';
 
 const routes = [
   {
     path: '/notebook/:notebookId',
     name: 'Notebook',
-    component: BoardView,
+    // component: BoardView,
+    component: ChatView,
     props: true,
     beforeEnter: authGuard,
   },
